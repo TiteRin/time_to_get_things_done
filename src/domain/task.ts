@@ -1,4 +1,5 @@
 import { normalizeName } from './name'
+import { ValidationError } from './validation'
 
 export type Difficulty = 'easy' | 'medium' | 'hard'
 
@@ -21,5 +22,11 @@ export function normalizeTask<T extends Omit<Task, 'id'>>(task: T): T {
   const normalized = Object.fromEntries(
     Object.entries(task).filter(([, value]) => value !== undefined),
   ) as T
+
+  const duration = normalized.expectedDuration
+  if (duration !== undefined && !(Number.isInteger(duration) && duration > 0)) {
+    throw new ValidationError('La durée doit être un nombre entier de minutes supérieur à zéro')
+  }
+
   return { ...normalized, name: normalizeTaskName(task.name) }
 }

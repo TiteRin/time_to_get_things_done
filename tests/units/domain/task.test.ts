@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { normalizeTask, normalizeTaskName } from '@/domain/task'
+import { ValidationError } from '@/domain/validation'
 
 describe('normalizeTaskName', () => {
   it('normalizes whitespace', () => {
@@ -42,5 +43,11 @@ describe('normalizeTask', () => {
         equipmentIds: undefined,
       }),
     ).toStrictEqual({ name: 'Aspirer' })
+  })
+
+  it.each([0, -5, 2.5, Number.NaN])('rejects an invalid duration (%s)', (expectedDuration) => {
+    expect(() => normalizeTask({ name: 'Aspirer', expectedDuration })).toThrow(
+      new ValidationError('La durée doit être un nombre entier de minutes supérieur à zéro'),
+    )
   })
 })
