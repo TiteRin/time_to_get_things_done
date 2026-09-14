@@ -19,9 +19,9 @@ export class TtgtdDatabase extends Dexie {
     })
 
     // Runs only when the database is created, i.e. on the user's first launch
-    this.on('populate', async (tx) => {
-      await tx.table('rooms').bulkAdd(defaultRooms)
-      await tx.table('tasks').bulkAdd(defaultTasks)
+    this.on('populate', async () => {
+      await this.rooms.bulkAdd(defaultRooms)
+      await this.tasks.bulkAdd(defaultTasks)
     })
   }
 }
