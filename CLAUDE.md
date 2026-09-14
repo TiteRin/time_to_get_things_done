@@ -34,6 +34,9 @@ Source is organized by technical kind (not by feature); add new top-level folder
 - `src/catalog/defaultCatalog.ts` — starter catalogue (task names + rooms, no equipment) copied into the user's database once, on first launch. Changing it only affects new users; existing copies are never touched.
 - `src/db/database.ts` — `TtgtdDatabase` (Dexie): `tasks`, `rooms`, `equipment` tables, seeded from the catalogue in the `populate` hook. Schema changes need a new `version()`. Unit tests use `fake-indexeddb` (loaded in `tests/setup.ts`) with a random database name per test.
 - **Id strategy**: catalogue entities use readable slugs (`cuisine-passer-le-balai`); everything the user creates gets `crypto.randomUUID()`. Never derive user ids from names.
+- `src/domain/` validation: `normalizeTask` (name required, duration a positive integer, equipment deduplicated, cleared fields dropped rather than stored as `undefined`) and `normalizeName` throw `ValidationError` with a French, user-facing message; anything else thrown is unexpected. `byName` sorts French-style (case/accent-insensitive, natural numbers).
+- `src/repositories/` — plain async functions taking the database first: `taskRepository` (`listTasks`, `createTask`, `updateTask` = full replace, `deleteTask`), `roomRepository` / `equipmentRepository` (`list…`, `findOrCreate…` deduplicating by name ignoring case and accents), built on `namedEntityRepository`.
+- `src/db/DatabaseProvider.tsx` + `src/hooks/useDatabase.ts` — the database is injected through context (tests and stories pass an isolated one; `useDatabase` throws outside a provider). Data hooks (`useTasks`, …) use `useLiveQuery`: the list is `undefined` while loading, and they expose the bound repository actions. Test helpers: `setupTestDatabases()` and `databaseWrapper(db)` in `tests/helpers/testDatabase.tsx`.
 
 ### Tests layout
 
