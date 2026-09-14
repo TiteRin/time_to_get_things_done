@@ -1,14 +1,19 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { findOrCreateEquipment, listEquipment } from '@/repositories/equipmentRepository'
+import { useMemo } from 'react'
+import * as equipmentRepository from '@/repositories/equipmentRepository'
 import { useDatabase } from './useDatabase'
 
 /** Live list of equipment (`undefined` while loading) */
 export function useEquipment() {
   const db = useDatabase()
-  const equipment = useLiveQuery(() => listEquipment(db), [db])
+  const equipment = useLiveQuery(() => equipmentRepository.listEquipment(db), [db])
 
-  return {
-    equipment,
-    findOrCreateEquipment: (name: string) => findOrCreateEquipment(db, name),
-  }
+  const actions = useMemo(
+    () => ({
+      findOrCreateEquipment: (name: string) => equipmentRepository.findOrCreateEquipment(db, name),
+    }),
+    [db],
+  )
+
+  return { equipment, ...actions }
 }

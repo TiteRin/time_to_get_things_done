@@ -41,4 +41,17 @@ describe('useTasks', () => {
     await act(() => hook.result.current.deleteTask(id))
     await waitFor(() => expect(hook.result.current.tasks).toEqual([]))
   })
+
+  it('keeps stable action identities across re-renders and list updates', async () => {
+    const { db, hook } = setup()
+    const before = { ...hook.result.current }
+
+    hook.rerender()
+    await act(() => db.tasks.clear())
+    await waitFor(() => expect(hook.result.current.tasks).toEqual([]))
+
+    expect(hook.result.current.createTask).toBe(before.createTask)
+    expect(hook.result.current.updateTask).toBe(before.updateTask)
+    expect(hook.result.current.deleteTask).toBe(before.deleteTask)
+  })
 })
