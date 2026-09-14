@@ -1,6 +1,6 @@
 import type { TtgtdDatabase } from '@/db/database'
 import { byName } from '@/domain/name'
-import { normalizeTaskName, type Task } from '@/domain/task'
+import { normalizeTask, type Task } from '@/domain/task'
 
 export type TaskInput = Omit<Task, 'id'>
 
@@ -10,14 +10,14 @@ export async function listTasks(db: TtgtdDatabase): Promise<Task[]> {
 }
 
 export async function createTask(db: TtgtdDatabase, input: TaskInput): Promise<Task> {
-  const task: Task = { ...input, id: crypto.randomUUID(), name: normalizeTaskName(input.name) }
+  const task: Task = { ...normalizeTask(input), id: crypto.randomUUID() }
   await db.tasks.add(task)
   return task
 }
 
 /** Replaces the whole task: fields missing from `task` are cleared */
 export async function updateTask(db: TtgtdDatabase, task: Task): Promise<Task> {
-  const updated: Task = { ...task, name: normalizeTaskName(task.name) }
+  const updated = normalizeTask(task)
 
   await db.transaction('rw', db.tasks, async () => {
     if (!(await db.tasks.get(task.id))) throw new Error('Tâche introuvable')

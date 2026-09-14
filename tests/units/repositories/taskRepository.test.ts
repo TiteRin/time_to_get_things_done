@@ -41,7 +41,13 @@ describe('taskRepository', () => {
         expectedDuration: 20,
         roomId: 'salon',
       })
-      expect(await db.tasks.get(task.id)).toEqual(task)
+      expect(await db.tasks.get(task.id)).toStrictEqual(task)
+    })
+
+    it('does not store undefined keys for fields left empty', async () => {
+      const task = await createTask(db, { name: 'Aspirer', roomId: undefined })
+
+      expect(await db.tasks.get(task.id)).toStrictEqual({ id: task.id, name: 'Aspirer' })
     })
 
     it('generates a distinct id for each task, even with the same name', async () => {
@@ -76,8 +82,20 @@ describe('taskRepository', () => {
         expectedDuration: 10,
       })
 
-      expect(updated).toEqual({ id: 't1', name: 'Faire la vaisselle', expectedDuration: 10 })
-      expect(await db.tasks.get('t1')).toEqual(updated)
+      expect(updated).toStrictEqual({ id: 't1', name: 'Faire la vaisselle', expectedDuration: 10 })
+      expect(await db.tasks.get('t1')).toStrictEqual(updated)
+    })
+
+    it('does not store undefined keys for fields cleared in a form', async () => {
+      await db.tasks.add({ id: 't1', name: 'Aspirer', roomId: 'salon', expectedDuration: 5 })
+
+      await updateTask(db, { id: 't1', name: 'Aspirer', roomId: undefined, expectedDuration: 5 })
+
+      expect(await db.tasks.get('t1')).toStrictEqual({
+        id: 't1',
+        name: 'Aspirer',
+        expectedDuration: 5,
+      })
     })
 
     it('refuses an empty name and keeps the stored task', async () => {

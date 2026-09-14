@@ -15,3 +15,11 @@ export type Task = {
 
 export const normalizeTaskName = (name: string) =>
   normalizeName(name, 'Le nom de la tâche est obligatoire')
+
+/** Validates a task (with or without id) before storing it; cleared fields are dropped, not kept as undefined */
+export function normalizeTask<T extends Omit<Task, 'id'>>(task: T): T {
+  const normalized = Object.fromEntries(
+    Object.entries(task).filter(([, value]) => value !== undefined),
+  ) as T
+  return { ...normalized, name: normalizeTaskName(task.name) }
+}
