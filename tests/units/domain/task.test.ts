@@ -50,4 +50,11 @@ describe('normalizeTask', () => {
       new ValidationError('La durée doit être un nombre entier de minutes supérieur à zéro'),
     )
   })
+
+  it('removes duplicate equipment and drops an empty equipment list', () => {
+    expect(
+      normalizeTask({ name: 'Nettoyer les sols', equipmentIds: ['seau', 'serpillere', 'seau'] }),
+    ).toStrictEqual({ name: 'Nettoyer les sols', equipmentIds: ['seau', 'serpillere'] })
+    expect(normalizeTask({ name: 'Aspirer', equipmentIds: [] })).toStrictEqual({ name: 'Aspirer' })
+  })
 })

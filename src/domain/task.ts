@@ -28,5 +28,11 @@ export function normalizeTask<T extends Omit<Task, 'id'>>(task: T): T {
     throw new ValidationError('La durée doit être un nombre entier de minutes supérieur à zéro')
   }
 
+  if (normalized.equipmentIds) {
+    const equipmentIds = [...new Set(normalized.equipmentIds)]
+    if (equipmentIds.length > 0) normalized.equipmentIds = equipmentIds
+    else delete normalized.equipmentIds
+  }
+
   return { ...normalized, name: normalizeTaskName(task.name) }
 }
