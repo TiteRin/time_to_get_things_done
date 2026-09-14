@@ -1,5 +1,7 @@
+import type { ReactNode } from 'react'
 import { afterEach } from 'vitest'
 import { TtgtdDatabase } from '@/db/database'
+import { DatabaseProvider } from '@/db/DatabaseProvider'
 
 /**
  * Returns a function opening isolated databases (random names on fake-indexeddb),
@@ -16,5 +18,12 @@ export function setupTestDatabases() {
     const db = new TtgtdDatabase(name)
     opened.push(db)
     return db
+  }
+}
+
+/** renderHook/render wrapper injecting the given database */
+export function databaseWrapper(db: TtgtdDatabase) {
+  return function DatabaseWrapper({ children }: { children: ReactNode }) {
+    return <DatabaseProvider db={db}>{children}</DatabaseProvider>
   }
 }
