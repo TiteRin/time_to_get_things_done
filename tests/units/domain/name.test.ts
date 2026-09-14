@@ -23,4 +23,10 @@ describe('byName', () => {
 
     expect(names).toEqual(['aspirer', 'Écrire', 'Faire', 'Vider'])
   })
+
+  it('sorts numbers inside names naturally', () => {
+    const names = [{ name: 'Chambre 10' }, { name: 'Chambre 2' }].sort(byName).map((e) => e.name)
+
+    expect(names).toEqual(['Chambre 2', 'Chambre 10'])
+  })
 })

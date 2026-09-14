@@ -7,6 +7,7 @@ export function normalizeName(name: string, emptyMessage: string): string {
   return normalized
 }
 
-/** Sorts named entities the French way, ignoring case and accents */
-export const byName = (a: { name: string }, b: { name: string }) =>
-  a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' })
+const collator = new Intl.Collator('fr', { sensitivity: 'base', numeric: true })
+
+/** Sorts named entities the French way, ignoring case and accents, numbers in natural order */
+export const byName = (a: { name: string }, b: { name: string }) => collator.compare(a.name, b.name)
