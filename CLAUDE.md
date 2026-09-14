@@ -65,12 +65,12 @@ Tests never live next to source. They sit under `tests/<kind>/` and mirror the p
 
 ## Domain model
 
-A **task** (corvée) has:
-- `name`
-- `expectedDuration`
-- `perceivedDifficulty`
-- `room` (optional — a task can apply to no specific room)
-- `sharedEquipment` (optional — equipment shared across tasks matters for the generation step, see below)
+A **task** (corvée, `src/domain/task.ts`) only requires a `name` — a task with just a name is usable right away; the rest is filled in whenever the user wants:
+- `expectedDuration` (minutes), `perceivedDifficulty` (`easy` / `medium` / `hard`)
+- `roomId` — reference to a `Room` (a task can apply to no specific room)
+- `equipmentIds` — references to `Equipment` (shared equipment matters for the generation step, see below)
+
+`Room` and `Equipment` are `{ id, name }` user-customizable lists; tasks reference them by id so renames propagate.
 
 ## Screens
 
