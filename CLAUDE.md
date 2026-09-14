@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-Scaffolded on 2026-09-14. First delivered slice: the **Exécution** screen (TDD), fed by hard-coded fixtures, ending on a placeholder end screen that dumps the raw timeline. Configuration, Débriefing, persistence and PWA manifest/service worker are not built yet.
+Scaffolded on 2026-09-14. First delivered slice: the **Exécution** screen (TDD), fed by hard-coded fixtures, ending on a placeholder end screen that dumps the raw timeline. Débriefing and PWA manifest/service worker are not built yet. In progress on `feat/configuration`: local persistence (Dexie) and the Configuration screen.
 
 ## Commands
 
@@ -31,6 +31,9 @@ Source is organized by technical kind (not by feature); add new top-level folder
 - `src/hooks/` — `useSession` (wraps the reducer, injects the clock, `toggle` maps idle/running/paused to START/PAUSE/RESUME), `useSwipe` (pointer-event swipe-up detection that swallows the trailing click).
 - `src/components/` — presentational components (`ExecutionScreen`, `TopMenu`, `SessionEndScreen`) that take props + callbacks only.
 - `src/app/App.tsx` — wires `useSession` to the screens and switches to the end screen when the session is `ended`.
+- `src/catalog/defaultCatalog.ts` — starter catalogue (task names + rooms, no equipment) copied into the user's database once, on first launch. Changing it only affects new users; existing copies are never touched.
+- `src/db/database.ts` — `TtgtdDatabase` (Dexie): `tasks`, `rooms`, `equipment` tables, seeded from the catalogue in the `populate` hook. Schema changes need a new `version()`. Unit tests use `fake-indexeddb` (loaded in `tests/setup.ts`) with a random database name per test.
+- **Id strategy**: catalogue entities use readable slugs (`cuisine-passer-le-balai`); everything the user creates gets `crypto.randomUUID()`. Never derive user ids from names.
 
 ### Tests layout
 
@@ -41,7 +44,7 @@ Tests never live next to source. They sit under `tests/<kind>/` and mirror the p
 - `tests/stories/<path>.stories.tsx` — Storybook stories, e.g. `tests/stories/components/ExecutionScreen.stories.tsx`
 - `tests/e2e/*.spec.ts` — Playwright user flows
 - `tests/setup.ts` — shared jsdom setup (jest-dom matchers, cleanup)
-- `src/fixtures/tasks.ts` — sample chores from the brief, used until the Configuration screen exists.
+- `src/fixtures/tasks.ts` — sample chores used by the execution screen until list creation exists.
 - Styling: Tailwind v4 (`@tailwindcss/vite`), imported in `src/index.css` (also loaded by `.storybook/preview.tsx`).
 - E2E tests use `page.clock.install` + `pauseAt` so timeline timestamps are deterministic.
 
