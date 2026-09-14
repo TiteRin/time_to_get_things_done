@@ -1,0 +1,6 @@
+*.md
+package-lock.json
+dist
+storybook-static
+test-results
+playwright-report
