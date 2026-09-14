@@ -16,3 +16,15 @@ export async function createTask(db: TtgtdDatabase, input: TaskInput): Promise<T
   await db.tasks.add(task)
   return task
 }
+
+/** Replaces the whole task: fields missing from `task` are cleared */
+export async function updateTask(db: TtgtdDatabase, task: Task): Promise<Task> {
+  const updated: Task = { ...task, name: normalizeTaskName(task.name) }
+
+  await db.transaction('rw', db.tasks, async () => {
+    if (!(await db.tasks.get(task.id))) throw new Error('Tâche introuvable')
+    await db.tasks.put(updated)
+  })
+
+  return updated
+}
