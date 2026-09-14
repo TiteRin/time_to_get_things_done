@@ -1,7 +1,9 @@
+import { ValidationError } from './validation'
+
 /** Trims and collapses whitespace; throws `emptyMessage` (user-facing) when nothing is left */
 export function normalizeName(name: string, emptyMessage: string): string {
   const normalized = name.trim().replace(/\s+/g, ' ')
-  if (!normalized) throw new Error(emptyMessage)
+  if (!normalized) throw new ValidationError(emptyMessage)
   return normalized
 }
 

@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import { byName, normalizeName } from '@/domain/name'
+import { ValidationError } from '@/domain/validation'
 
 describe('normalizeName', () => {
   it('trims and collapses whitespace', () => {
     expect(normalizeName('  Salle   de bain ', 'vide')).toBe('Salle de bain')
   })
 
-  it.each(['', '   '])('throws the given message for an empty name (%j)', (name) => {
-    expect(() => normalizeName(name, 'Nom obligatoire')).toThrow('Nom obligatoire')
+  it.each(['', '   '])('throws a ValidationError with the given message (%j)', (name) => {
+    expect(() => normalizeName(name, 'Nom obligatoire')).toThrow(
+      new ValidationError('Nom obligatoire'),
+    )
+    expect(() => normalizeName(name, 'Nom obligatoire')).toThrow(ValidationError)
   })
 })
 
