@@ -10,3 +10,10 @@ export type Task = {
   roomId?: string
   equipmentIds?: string[]
 }
+
+/** Trims and collapses whitespace; throws when nothing is left (the message is user-facing) */
+export function normalizeTaskName(name: string): string {
+  const normalized = name.trim().replace(/\s+/g, ' ')
+  if (!normalized) throw new Error('Le nom de la tâche est obligatoire')
+  return normalized
+}
