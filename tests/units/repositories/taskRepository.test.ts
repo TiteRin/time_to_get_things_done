@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { TtgtdDatabase } from '@/db/database'
-import { listTasks } from '@/repositories/taskRepository'
+import { createTask, listTasks } from '@/repositories/taskRepository'
 import { setupTestDatabases } from '../../helpers/testDatabase'
 
 const openDatabase = setupTestDatabases()
@@ -24,6 +24,39 @@ describe('taskRepository', () => {
       const names = (await listTasks(db)).map((task) => task.name)
 
       expect(names).toEqual(['aspirer', 'Écrire la liste', 'Faire le lit', 'Vider le frigo'])
+    })
+  })
+
+  describe('createTask', () => {
+    it('stores a task with a generated id and a normalized name', async () => {
+      const task = await createTask(db, {
+        name: '  Laver   les vitres ',
+        expectedDuration: 20,
+        roomId: 'salon',
+      })
+
+      expect(task).toEqual({
+        id: expect.stringMatching(/^[0-9a-f-]{36}$/),
+        name: 'Laver les vitres',
+        expectedDuration: 20,
+        roomId: 'salon',
+      })
+      expect(await db.tasks.get(task.id)).toEqual(task)
+    })
+
+    it('generates a distinct id for each task, even with the same name', async () => {
+      const first = await createTask(db, { name: 'Passer le balai' })
+      const second = await createTask(db, { name: 'Passer le balai' })
+
+      expect(first.id).not.toBe(second.id)
+      expect(await db.tasks.count()).toBe(2)
+    })
+
+    it('refuses an empty name and stores nothing', async () => {
+      await expect(createTask(db, { name: '  ' })).rejects.toThrow(
+        'Le nom de la tâche est obligatoire',
+      )
+      expect(await db.tasks.count()).toBe(0)
     })
   })
 })
