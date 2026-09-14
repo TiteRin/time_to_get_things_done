@@ -1,19 +1,23 @@
 import type { Room } from '@/domain/room'
 import type { Task } from '@/domain/task'
 
-/**
+/*
  * Starter catalogue copied into each user's local database on first launch.
  * Editing it only affects new users: existing copies are never touched.
+ * Ids are readable slugs; anything the user creates later gets a UUID, so they cannot collide.
  */
-export const defaultRooms: Room[] = [
-  { id: 'salon', name: 'Salon' },
-  { id: 'cuisine', name: 'Cuisine' },
-  { id: 'salle-de-bain', name: 'Salle de bain' },
-  { id: 'toilettes', name: 'Toilettes' },
-  { id: 'chambre', name: 'Chambre' },
-]
 
-const taskNamesByRoom: Record<Room['id'] | 'none', string[]> = {
+const roomNames = {
+  salon: 'Salon',
+  cuisine: 'Cuisine',
+  'salle-de-bain': 'Salle de bain',
+  toilettes: 'Toilettes',
+  chambre: 'Chambre',
+} as const
+
+type DefaultRoomId = keyof typeof roomNames
+
+const taskNamesByRoom: Record<DefaultRoomId, string[]> = {
   salon: [
     'Passer le balai',
     'Nettoyer les sols',
@@ -46,21 +50,23 @@ const taskNamesByRoom: Record<Room['id'] | 'none', string[]> = {
   ],
   toilettes: ['Passer le balai', 'Nettoyer les sols', 'Nettoyer les toilettes'],
   chambre: ['Passer le balai', 'Faire le lit', 'Laver les draps'],
-  none: ['Faire les litières', 'Aspirer'],
 }
+
+const taskNamesWithoutRoom = ['Faire les litières', 'Aspirer']
 
 const slugify = (value: string) =>
   value
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/\p{Diacritic}/gu, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
 
-export const defaultTasks: Task[] = Object.entries(taskNamesByRoom).flatMap(([roomId, names]) =>
-  names.map((name) =>
-    roomId === 'none'
-      ? { id: slugify(name), name }
-      : { id: `${roomId}-${slugify(name)}`, name, roomId },
+export const defaultRooms: Room[] = Object.entries(roomNames).map(([id, name]) => ({ id, name }))
+
+export const defaultTasks: Task[] = [
+  ...Object.entries(taskNamesByRoom).flatMap(([roomId, names]) =>
+    names.map((name) => ({ id: `${roomId}-${slugify(name)}`, name, roomId })),
   ),
-)
+  ...taskNamesWithoutRoom.map((name) => ({ id: slugify(name), name })),
+]
