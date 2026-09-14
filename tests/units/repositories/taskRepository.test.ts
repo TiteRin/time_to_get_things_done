@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { TtgtdDatabase } from '@/db/database'
-import { createTask, listTasks, updateTask } from '@/repositories/taskRepository'
+import { createTask, deleteTask, listTasks, updateTask } from '@/repositories/taskRepository'
 import { setupTestDatabases } from '../../helpers/testDatabase'
 
 const openDatabase = setupTestDatabases()
@@ -94,6 +94,23 @@ describe('taskRepository', () => {
         'Tâche introuvable',
       )
       expect(await db.tasks.count()).toBe(0)
+    })
+  })
+
+  describe('deleteTask', () => {
+    it('removes only the given task', async () => {
+      await db.tasks.bulkAdd([
+        { id: 't1', name: 'Aspirer' },
+        { id: 't2', name: 'Faire le lit' },
+      ])
+
+      await deleteTask(db, 't1')
+
+      expect(await db.tasks.toArray()).toEqual([{ id: 't2', name: 'Faire le lit' }])
+    })
+
+    it('does nothing when the task is already gone', async () => {
+      await expect(deleteTask(db, 'missing')).resolves.toBeUndefined()
     })
   })
 })

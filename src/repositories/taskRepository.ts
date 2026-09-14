@@ -28,3 +28,7 @@ export async function updateTask(db: TtgtdDatabase, task: Task): Promise<Task> {
 
   return updated
 }
+
+export async function deleteTask(db: TtgtdDatabase, id: Task['id']): Promise<void> {
+  await db.tasks.delete(id)
+}
