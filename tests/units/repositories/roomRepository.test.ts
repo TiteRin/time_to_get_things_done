@@ -15,11 +15,17 @@ describe('roomRepository', () => {
   it('lists rooms sorted by name', async () => {
     await db.rooms.bulkAdd([
       { id: '1', name: 'Salon' },
-      { id: '2', name: 'Bureau' },
+      { id: '2', name: 'bureau' },
       { id: '3', name: 'Entrée' },
+      { id: '4', name: 'Grenier' },
     ])
 
-    expect((await listRooms(db)).map((room) => room.name)).toEqual(['Bureau', 'Entrée', 'Salon'])
+    expect((await listRooms(db)).map((room) => room.name)).toEqual([
+      'bureau',
+      'Entrée',
+      'Grenier',
+      'Salon',
+    ])
   })
 
   it('creates a room with a generated id and a normalized name', async () => {
@@ -35,6 +41,16 @@ describe('roomRepository', () => {
     const room = await findOrCreateRoom(db, 'SALLE DE BAÏN')
 
     expect(room).toEqual({ id: 'salle-de-bain', name: 'Salle de bain' })
+    expect(await db.rooms.count()).toBe(1)
+  })
+
+  it('creates a single room when the same name is added concurrently', async () => {
+    const [first, second] = await Promise.all([
+      findOrCreateRoom(db, 'Bureau'),
+      findOrCreateRoom(db, 'bureau'),
+    ])
+
+    expect(second).toEqual(first)
     expect(await db.rooms.count()).toBe(1)
   })
 
