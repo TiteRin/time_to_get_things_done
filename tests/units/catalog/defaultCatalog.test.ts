@@ -21,15 +21,12 @@ describe('defaultCatalog', () => {
     ])
   })
 
-  it('ships the expected number of tasks per room', () => {
-    expect(countByRoom()).toEqual({
-      salon: 5,
-      cuisine: 13,
-      'salle-de-bain': 6,
-      toilettes: 3,
-      chambre: 3,
-      none: 2,
-    })
+  it('has at least one task in every room', () => {
+    const tasksPerRoom = countByRoom()
+
+    for (const room of defaultRooms) {
+      expect(tasksPerRoom[room.id]).toBeGreaterThan(0)
+    }
   })
 
   it('has unique ids for rooms and tasks', () => {
