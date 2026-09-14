@@ -37,7 +37,7 @@ const taskNamesByRoom: Record<DefaultRoomId, string[]> = {
     'Nettoyer le frigo',
     'Planifier les repas',
     'Commander les courses',
-    'Nettoyer le micro-onde',
+    'Nettoyer le micro-ondes',
     'Nettoyer le four',
   ],
   'salle-de-bain': [
