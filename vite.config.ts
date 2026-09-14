@@ -16,6 +16,8 @@ export default defineConfig({
     alias: { '@': path.join(dirname, 'src') },
   },
   test: {
+    // Restore spies/mocks between tests so a stubbed console.error can't leak
+    restoreMocks: true,
     projects: [
       ...(['units', 'integration'] as const).map((name) => ({
         extends: true as const,
