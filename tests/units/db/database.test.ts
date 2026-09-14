@@ -1,22 +1,13 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { defaultRooms, defaultTasks } from '@/catalog/defaultCatalog'
 import { TtgtdDatabase } from '@/db/database'
+import { setupTestDatabases } from '../../helpers/testDatabase'
 
-const opened: TtgtdDatabase[] = []
-
-function openDatabase(name: string) {
-  const db = new TtgtdDatabase(name)
-  opened.push(db)
-  return db
-}
-
-afterEach(async () => {
-  await Promise.all(opened.splice(0).map((db) => db.delete()))
-})
+const openDatabase = setupTestDatabases()
 
 describe('TtgtdDatabase', () => {
   it('copies the default catalogue on first launch', async () => {
-    const db = openDatabase(crypto.randomUUID())
+    const db = openDatabase()
 
     expect(await db.rooms.toArray()).toEqual(expect.arrayContaining(defaultRooms))
     expect(await db.rooms.count()).toBe(defaultRooms.length)
