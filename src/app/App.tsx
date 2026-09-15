@@ -1,28 +1,20 @@
-import type { Task } from '@/domain/task'
-import { ExecutionScreen } from '@/components/ExecutionScreen'
-import { SessionEndScreen } from '@/components/SessionEndScreen'
-import { useSession } from '@/hooks/useSession'
-import { sampleTasks } from '@/fixtures/tasks'
+import { Route, Routes } from 'react-router'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { appDatabase } from '@/db/appDatabase'
+import type { TtgtdDatabase } from '@/db/database'
+import { DatabaseProvider } from '@/db/DatabaseProvider'
+import { ConfigurationPage } from '@/pages/ConfigurationPage'
+import { ExecutionPage } from '@/pages/ExecutionPage'
 
-export function App({ tasks = sampleTasks }: { tasks?: Task[] }) {
-  const { state, currentTask, toggle, next, openMenu, closeMenu, finish } = useSession(tasks)
-
-  if (state.status === 'ended' || !currentTask) {
-    return <SessionEndScreen tasks={state.tasks} timeline={state.timeline} />
-  }
-
+export function App({ db = appDatabase }: { db?: TtgtdDatabase }) {
   return (
-    <ExecutionScreen
-      task={currentTask}
-      status={state.status}
-      menuOpen={state.menuOpen}
-      position={state.currentIndex + 1}
-      total={state.tasks.length}
-      onToggle={toggle}
-      onNext={next}
-      onOpenMenu={openMenu}
-      onCloseMenu={closeMenu}
-      onFinish={finish}
-    />
+    <ErrorBoundary>
+      <DatabaseProvider db={db}>
+        <Routes>
+          <Route path="/" element={<ExecutionPage />} />
+          <Route path="/configuration" element={<ConfigurationPage />} />
+        </Routes>
+      </DatabaseProvider>
+    </ErrorBoundary>
   )
 }

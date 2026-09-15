@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-Scaffolded on 2026-09-14. First delivered slice: the **Exécution** screen (TDD), fed by hard-coded fixtures, ending on a placeholder end screen that dumps the raw timeline. Configuration, Débriefing, persistence and PWA manifest/service worker are not built yet.
+Scaffolded on 2026-09-14. First delivered slice: the **Exécution** screen (TDD), fed by hard-coded fixtures, ending on a placeholder end screen that dumps the raw timeline. Débriefing and PWA manifest/service worker are not built yet. In progress on `feat/configuration`: local persistence (Dexie) and the Configuration screen.
 
 ## Commands
 
@@ -31,6 +31,12 @@ Source is organized by technical kind (not by feature); add new top-level folder
 - `src/hooks/` — `useSession` (wraps the reducer, injects the clock, `toggle` maps idle/running/paused to START/PAUSE/RESUME), `useSwipe` (pointer-event swipe-up detection that swallows the trailing click).
 - `src/components/` — presentational components (`ExecutionScreen`, `TopMenu`, `SessionEndScreen`) that take props + callbacks only.
 - `src/app/App.tsx` — wires `useSession` to the screens and switches to the end screen when the session is `ended`.
+- `src/catalog/defaultCatalog.ts` — starter catalogue (task names + rooms, no equipment) copied into the user's database once, on first launch. Changing it only affects new users; existing copies are never touched.
+- `src/db/database.ts` — `TtgtdDatabase` (Dexie): `tasks`, `rooms`, `equipment` tables, seeded from the catalogue in the `populate` hook. Schema changes need a new `version()`. Unit tests use `fake-indexeddb` (loaded in `tests/setup.ts`) with a random database name per test.
+- **Id strategy**: catalogue entities use readable slugs (`cuisine-passer-le-balai`); everything the user creates gets `crypto.randomUUID()`. Never derive user ids from names.
+- `src/domain/` validation: `normalizeTask` (name required, duration a positive integer, equipment deduplicated, cleared fields dropped rather than stored as `undefined`) and `normalizeName` throw `ValidationError` with a French, user-facing message; anything else thrown is unexpected. `byName` sorts French-style (case/accent-insensitive, natural numbers).
+- `src/repositories/` — plain async functions taking the database first: `taskRepository` (`listTasks`, `createTask`, `updateTask` = full replace, `deleteTask`), `roomRepository` / `equipmentRepository` (`list…`, `findOrCreate…` deduplicating by name ignoring case and accents), built on `namedEntityRepository`.
+- `src/db/DatabaseProvider.tsx` + `src/hooks/useDatabase.ts` — the database is injected through context (tests and stories pass an isolated one; `useDatabase` throws outside a provider). Data hooks (`useTasks`, …) use `useLiveQuery`: the list is `undefined` while loading, and they expose the bound repository actions. Test helpers: `setupTestDatabases()` and `databaseWrapper(db)` in `tests/helpers/testDatabase.tsx`.
 
 ### Tests layout
 
@@ -41,7 +47,7 @@ Tests never live next to source. They sit under `tests/<kind>/` and mirror the p
 - `tests/stories/<path>.stories.tsx` — Storybook stories, e.g. `tests/stories/components/ExecutionScreen.stories.tsx`
 - `tests/e2e/*.spec.ts` — Playwright user flows
 - `tests/setup.ts` — shared jsdom setup (jest-dom matchers, cleanup)
-- `src/fixtures/tasks.ts` — sample chores from the brief, used until the Configuration screen exists.
+- `src/fixtures/tasks.ts` — sample chores used by the execution screen until list creation exists.
 - Styling: Tailwind v4 (`@tailwindcss/vite`), imported in `src/index.css` (also loaded by `.storybook/preview.tsx`).
 - E2E tests use `page.clock.install` + `pauseAt` so timeline timestamps are deterministic.
 
@@ -49,7 +55,7 @@ Tests never live next to source. They sit under `tests/<kind>/` and mirror the p
 
 - Center tap: start / pause / resume. The elapsed time is never displayed.
 - Bottom tap or swipe up: current task is **done** (`complete` entry, even if never started), next task starts idle and waits for a tap. On the last task it ends the session.
-- Top tap: menu with **Terminer** (end session → end screen) and **Annuler** (close menu). The menu does not pause the timer; swipes are disabled while it is open.
+- Top tap: menu with **Terminer** (end session → end screen), **Annuler** (close menu) and a **Configuration** link. The menu does not pause the timer; swipes are disabled while it is open.
 - No session persistence: reloading loses the session.
 
 ## Project overview
@@ -65,12 +71,12 @@ Tests never live next to source. They sit under `tests/<kind>/` and mirror the p
 
 ## Domain model
 
-A **task** (corvée) has:
-- `name`
-- `expectedDuration`
-- `perceivedDifficulty`
-- `room` (optional — a task can apply to no specific room)
-- `sharedEquipment` (optional — equipment shared across tasks matters for the generation step, see below)
+A **task** (corvée, `src/domain/task.ts`) only requires a `name` — a task with just a name is usable right away; the rest is filled in whenever the user wants:
+- `expectedDuration` (minutes), `perceivedDifficulty` (`easy` / `medium` / `hard`)
+- `roomId` — reference to a `Room` (a task can apply to no specific room)
+- `equipmentIds` — references to `Equipment` (shared equipment matters for the generation step, see below)
+
+`Room` and `Equipment` are `{ id, name }` user-customizable lists; tasks reference them by id so renames propagate.
 
 ## Screens
 

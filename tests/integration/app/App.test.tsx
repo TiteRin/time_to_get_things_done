@@ -1,45 +1,64 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router'
 import { describe, expect, it } from 'vitest'
-import type { Task } from '@/domain/task'
 import { App } from '@/app/App'
+import { setupTestDatabases } from '../../helpers/testDatabase'
 
-const tasks: Task[] = [
-  { id: 'a', name: 'Faire la vaisselle', expectedDuration: 15, perceivedDifficulty: 'medium' },
-  { id: 'b', name: 'Faire les litières', expectedDuration: 5, perceivedDifficulty: 'easy' },
-]
+const openDatabase = setupTestDatabases()
+
+const renderAt = (path: string) =>
+  render(
+    <MemoryRouter initialEntries={[path]}>
+      <App db={openDatabase()} />
+    </MemoryRouter>,
+  )
 
 describe('App', () => {
-  it('runs through every task then shows the end screen', async () => {
-    const user = userEvent.setup()
-    render(<App tasks={tasks} />)
-
-    expect(screen.getByRole('heading', { name: 'Faire la vaisselle' })).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Démarrer' }))
-    await user.click(screen.getByRole('button', { name: 'Tâche suivante' }))
-
-    expect(screen.getByRole('heading', { name: 'Faire les litières' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Démarrer' })).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Tâche suivante' }))
-
-    expect(screen.getByRole('heading', { name: 'Session terminée' })).toBeInTheDocument()
-  })
-
-  it('ends the session early from the top menu', async () => {
-    const user = userEvent.setup()
-    render(<App tasks={tasks} />)
-
-    await user.click(screen.getByRole('button', { name: 'Afficher le menu' }))
-    await user.click(screen.getByRole('button', { name: 'Terminer' }))
-
-    expect(screen.getByRole('heading', { name: 'Session terminée' })).toBeInTheDocument()
-  })
-
-  it('uses the sample tasks by default', () => {
-    render(<App />)
+  it('shows the execution screen on the root route', () => {
+    renderAt('/')
 
     expect(
       screen.getByRole('heading', { name: 'Passer le balai dans le salon' }),
     ).toBeInTheDocument()
+  })
+
+  it('shows the configuration page on /configuration', async () => {
+    renderAt('/configuration')
+
+    expect(screen.getByRole('heading', { name: 'Configuration' })).toBeInTheDocument()
+    expect(await screen.findByText('Nettoyer les fontaines')).toBeInTheDocument()
+  })
+
+  it('navigates from the configuration page to the execution screen', async () => {
+    const user = userEvent.setup()
+    renderAt('/configuration')
+
+    await user.click(screen.getByRole('link', { name: 'Lancer la session' }))
+
+    expect(
+      screen.getByRole('heading', { name: 'Passer le balai dans le salon' }),
+    ).toBeInTheDocument()
+  })
+
+  it('navigates from the execution menu to the configuration page', async () => {
+    const user = userEvent.setup()
+    renderAt('/')
+
+    await user.click(screen.getByRole('button', { name: 'Afficher le menu' }))
+    await user.click(screen.getByRole('link', { name: 'Configuration' }))
+
+    expect(screen.getByRole('heading', { name: 'Configuration' })).toBeInTheDocument()
+  })
+
+  it('navigates from the session end screen to the configuration page', async () => {
+    const user = userEvent.setup()
+    renderAt('/')
+
+    await user.click(screen.getByRole('button', { name: 'Afficher le menu' }))
+    await user.click(screen.getByRole('button', { name: 'Terminer' }))
+    await user.click(screen.getByRole('link', { name: 'Configuration' }))
+
+    expect(screen.getByRole('heading', { name: 'Configuration' })).toBeInTheDocument()
   })
 })

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { SessionStatus } from '@/domain/session'
 import type { Task } from '@/domain/task'
 import { TopMenu } from './TopMenu'
@@ -15,6 +16,8 @@ export type ExecutionScreenProps = {
   onOpenMenu: () => void
   onCloseMenu: () => void
   onFinish: () => void
+  /** Extra actions shown at the bottom of the top menu */
+  menuExtra?: ReactNode
 }
 
 const CENTER_LABEL = { idle: 'Démarrer', running: 'Pause', paused: 'Reprendre' } as const
@@ -35,6 +38,7 @@ export function ExecutionScreen({
   onOpenMenu,
   onCloseMenu,
   onFinish,
+  menuExtra,
 }: ExecutionScreenProps) {
   const swipeHandlers = useSwipe({ onSwipeUp: onNext })
   const isLast = position === total
@@ -92,7 +96,11 @@ export function ExecutionScreen({
         <span className="text-sm">{isLast ? 'Dernière tâche' : 'Tâche suivante'}</span>
       </button>
 
-      {menuOpen && <TopMenu onCancel={onCloseMenu} onFinish={onFinish} />}
+      {menuOpen && (
+        <TopMenu onCancel={onCloseMenu} onFinish={onFinish}>
+          {menuExtra}
+        </TopMenu>
+      )}
     </main>
   )
 }

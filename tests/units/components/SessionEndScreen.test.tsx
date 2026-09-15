@@ -39,4 +39,11 @@ describe('SessionEndScreen', () => {
 
     expect(screen.getByText('Aucune action enregistrée.')).toBeInTheDocument()
   })
+
+  it('renders the footer inside the screen so it stays visible', () => {
+    render(<SessionEndScreen tasks={tasks} timeline={[]} footer={<a href="/">Configuration</a>} />)
+
+    const main = screen.getByRole('main')
+    expect(within(main).getByRole('link', { name: 'Configuration' })).toBeInTheDocument()
+  })
 })

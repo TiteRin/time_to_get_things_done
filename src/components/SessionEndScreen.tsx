@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { TimelineEntry } from '@/domain/session'
 import type { Task } from '@/domain/task'
 
@@ -20,9 +21,11 @@ function formatElapsed(ms: number): string {
 export function SessionEndScreen({
   tasks,
   timeline,
+  footer,
 }: {
   tasks: Task[]
   timeline: TimelineEntry[]
+  footer?: ReactNode
 }) {
   const origin = timeline[0]?.at ?? 0
 
@@ -46,6 +49,8 @@ export function SessionEndScreen({
           ))}
         </ol>
       )}
+
+      {footer && <div className="mt-8 text-center">{footer}</div>}
     </main>
   )
 }
