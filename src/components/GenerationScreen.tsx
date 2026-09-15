@@ -2,6 +2,7 @@ import { DndContext, PointerSensor, closestCenter, useSensor, useSensors } from 
 import type { DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import type { ReactNode } from 'react'
 import type { Task } from '@/domain/task'
 import { totalExpectedDuration } from '@/domain/taskSelection'
 
@@ -17,6 +18,7 @@ export function GenerationScreen({
   onNextStep,
   onPreviousStep,
   onStart,
+  footerExtra,
 }: {
   step: GenerationStep
   /** The whole catalogue, shown during the selection step */
@@ -29,6 +31,8 @@ export function GenerationScreen({
   onNextStep: () => void
   onPreviousStep: () => void
   onStart: () => void
+  /** Extra navigation rendered under the step buttons (e.g. a Configuration link) */
+  footerExtra?: ReactNode
 }) {
   const count = selected.length
   const summary = `${count} tâche${count > 1 ? 's' : ''} sélectionnée${count > 1 ? 's' : ''}, durée approximative ~ ${totalExpectedDuration(selected)} minutes`
@@ -48,7 +52,9 @@ export function GenerationScreen({
       </div>
 
       <footer className="mt-6 flex flex-col gap-4">
-        <p className="text-center text-sm text-slate-400">{summary}</p>
+        <p aria-live="polite" className="text-center text-sm text-slate-400">
+          {summary}
+        </p>
         <div className="flex gap-4">
           {step === 'select' ? (
             <button
@@ -77,6 +83,7 @@ export function GenerationScreen({
             Démarrer
           </button>
         </div>
+        {footerExtra}
       </footer>
     </main>
   )
@@ -107,6 +114,7 @@ function SelectionList({
             <button
               type="button"
               onClick={() => onToggle(task.id)}
+              aria-pressed={isSelected}
               aria-label={`${isSelected ? 'Désélectionner' : 'Sélectionner'} ${task.name}`}
               className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
                 isSelected
@@ -142,7 +150,16 @@ function OrderingList({
   }
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+      accessibility={{
+        screenReaderInstructions: {
+          draggable: 'Utilisez les flèches haut et bas pour déplacer la tâche dans la liste.',
+        },
+      }}
+    >
       <SortableContext
         items={selected.map((task) => task.id)}
         strategy={verticalListSortingStrategy}
@@ -180,7 +197,7 @@ function OrderingItem({
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className="flex touch-none items-center gap-4 bg-slate-900 py-3"
+      className="flex items-center gap-4 bg-slate-900 py-3"
     >
       <button
         type="button"
@@ -188,10 +205,11 @@ function OrderingItem({
         {...listeners}
         aria-label={`Déplacer ${task.name}`}
         onKeyDown={(event) => {
-          if (event.key === 'ArrowDown') onReorder(index, index + 1)
-          if (event.key === 'ArrowUp') onReorder(index, index - 1)
+          if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
+          event.preventDefault()
+          onReorder(index, event.key === 'ArrowDown' ? index + 1 : index - 1)
         }}
-        className="cursor-grab px-1 text-lg text-slate-400"
+        className="cursor-grab touch-none px-1 text-lg text-slate-400"
       >
         ⠿
       </button>

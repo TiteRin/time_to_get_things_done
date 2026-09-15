@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { GenerationScreen } from '@/components/GenerationScreen'
 import type { GenerationStep } from '@/components/GenerationScreen'
 import { reorder, toggleId } from '@/domain/taskSelection'
@@ -32,6 +32,11 @@ export function GenerationPage() {
         saveLastList(validIds)
         navigate('/execution')
       }}
+      footerExtra={
+        <Link to="/configuration" className="text-center font-medium text-emerald-400">
+          Configuration
+        </Link>
+      }
     />
   )
 }

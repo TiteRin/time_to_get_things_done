@@ -53,6 +53,15 @@ describe('App', () => {
     expect(await screen.findByText('Nettoyer les fontaines')).toBeInTheDocument()
   })
 
+  it('navigates from the generation screen to the configuration page', async () => {
+    const user = userEvent.setup()
+    renderAt('/')
+
+    await user.click(screen.getByRole('link', { name: 'Configuration' }))
+
+    expect(screen.getByRole('heading', { name: 'Configuration' })).toBeInTheDocument()
+  })
+
   it('navigates from the configuration page to the generation screen', async () => {
     const user = userEvent.setup()
     renderAt('/configuration')

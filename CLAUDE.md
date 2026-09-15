@@ -46,8 +46,8 @@ Tests never live next to source. They sit under `tests/<kind>/` and mirror the p
 - `tests/integration/<path>.test.tsx` — several real modules wired together, e.g. `tests/integration/app/App.test.tsx`
 - `tests/stories/<path>.stories.tsx` — Storybook stories, e.g. `tests/stories/components/ExecutionScreen.stories.tsx`
 - `tests/e2e/*.spec.ts` — Playwright user flows
-- `tests/setup.ts` — shared jsdom setup (jest-dom matchers, cleanup)
-- `src/fixtures/tasks.ts` — sample chores used by the execution screen until list creation exists.
+- `tests/setup.ts` — shared jsdom setup (jest-dom matchers, cleanup, working localStorage shim — Node 25's broken global shadows jsdom's — cleared after each test)
+- `src/fixtures/tasks.ts` — sample chores, now only used by stories.
 - Styling: Tailwind v4 (`@tailwindcss/vite`), imported in `src/index.css` (also loaded by `.storybook/preview.tsx`).
 - E2E tests use `page.clock.install` + `pauseAt` so timeline timestamps are deterministic.
 

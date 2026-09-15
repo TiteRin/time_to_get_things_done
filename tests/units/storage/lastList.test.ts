@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { loadLastList, saveLastList } from '@/storage/lastList'
 
 describe('lastList storage', () => {
@@ -19,5 +19,18 @@ describe('lastList storage', () => {
 
     window.localStorage.setItem('ttgtd.lastList', '{"foo": 1}')
     expect(loadLastList()).toEqual([])
+  })
+
+  it('drops duplicated and non-string ids', () => {
+    window.localStorage.setItem('ttgtd.lastList', '["a", 3, "b", "a"]')
+    expect(loadLastList()).toEqual(['a', 'b'])
+  })
+
+  it('ignores storage failures on save', () => {
+    vi.spyOn(window.localStorage, 'setItem').mockImplementation(() => {
+      throw new Error('QuotaExceededError')
+    })
+    expect(() => saveLastList(['a'])).not.toThrow()
+    vi.restoreAllMocks()
   })
 })
