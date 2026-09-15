@@ -2,6 +2,15 @@ import { expect, test, type Page } from '@playwright/test'
 
 const heading = (page: Page, name: string) => page.getByRole('heading', { name, exact: true })
 
+const START = new Date('2026-09-14T10:00:00')
+
+/**
+ * Moves the recorded time to `seconds` after the session start. `setFixedTime` only
+ * fakes `Date.now()`, unlike `install()`, whose frozen timers stall Dexie's queries.
+ */
+const elapsed = (page: Page, seconds: number) =>
+  page.clock.setFixedTime(new Date(START.getTime() + seconds * 1000))
+
 async function swipeUp(page: Page) {
   const viewport = page.viewportSize()!
   const x = viewport.width / 2
@@ -19,15 +28,13 @@ async function swipeUp(page: Page) {
 }
 
 test.beforeEach(async ({ page }) => {
-  await page.clock.install({ time: new Date('2026-09-14T10:00:00') })
   await page.goto('/')
   // Build the session list on the generation screen
   for (const name of ['Nettoyer les fontaines', 'Faire la vaisselle', 'Faire les litières']) {
     await page.getByRole('button', { name: `Sélectionner ${name}` }).click()
   }
+  await elapsed(page, 0)
   await page.getByRole('button', { name: 'Démarrer' }).click()
-  // Freeze time so only runFor() moves it and recorded timestamps stay deterministic
-  await page.clock.pauseAt(new Date('2026-09-14T10:01:00'))
 })
 
 test('runs a session with taps, a swipe and the top menu', async ({ page }) => {
@@ -37,19 +44,19 @@ test('runs a session with taps, a swipe and the top menu', async ({ page }) => {
   await page.getByRole('button', { name: 'Démarrer' }).click()
   await expect(page.getByText('En cours')).toBeVisible()
 
-  await page.clock.runFor('01:00')
+  await elapsed(page, 60)
   await page.getByRole('button', { name: 'Pause' }).click()
   await expect(page.getByText('En pause')).toBeVisible()
 
-  await page.clock.runFor('00:30')
+  await elapsed(page, 90)
   await page.getByRole('button', { name: 'Reprendre' }).click()
 
-  await page.clock.runFor('02:00')
+  await elapsed(page, 210)
   await page.getByRole('button', { name: 'Tâche suivante' }).click()
   await expect(heading(page, 'Faire la vaisselle')).toBeVisible()
   await expect(page.getByText('Touchez pour commencer')).toBeVisible()
 
-  await page.clock.runFor('00:10')
+  await elapsed(page, 220)
   await swipeUp(page)
   await expect(heading(page, 'Faire les litières')).toBeVisible()
 
@@ -58,7 +65,7 @@ test('runs a session with taps, a swipe and the top menu', async ({ page }) => {
   await expect(page.getByRole('dialog')).toBeHidden()
   await expect(heading(page, 'Faire les litières')).toBeVisible()
 
-  await page.clock.runFor('00:05')
+  await elapsed(page, 225)
   await page.getByRole('button', { name: 'Afficher le menu' }).click()
   await page.getByRole('button', { name: 'Terminer' }).click()
 

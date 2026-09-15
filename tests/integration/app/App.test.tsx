@@ -66,7 +66,7 @@ describe('App', () => {
     const user = userEvent.setup()
     renderAt('/configuration')
 
-    await user.click(screen.getByRole('link', { name: 'Créer une liste' }))
+    await user.click(await screen.findByRole('link', { name: 'Créer une liste' }))
 
     expect(await screen.findByRole('heading', { name: 'Choisir les tâches' })).toBeInTheDocument()
   })

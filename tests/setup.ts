@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest'
 import 'fake-indexeddb/auto'
-import { cleanup } from '@testing-library/react'
+import { cleanup, configure } from '@testing-library/react'
 import { afterEach } from 'vitest'
 
 // Node 25 exposes a global localStorage without any method (no --localstorage-file),
@@ -19,6 +19,9 @@ const localStorage: Storage = {
 for (const target of [globalThis, window]) {
   Object.defineProperty(target, 'localStorage', { value: localStorage, configurable: true })
 }
+
+// Seeding the catalogue into fake-indexeddb can exceed the 1s default on a loaded CI runner
+configure({ asyncUtilTimeout: 5000 })
 
 afterEach(() => {
   cleanup()
