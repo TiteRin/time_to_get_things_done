@@ -51,7 +51,11 @@ export function RoomSelect({
             value={name}
             autoFocus
             onChange={(event) => setName(event.target.value)}
-            onKeyDown={(event) => event.key === 'Enter' && submitNewRoom()}
+            onKeyDown={(event) => {
+              if (event.key !== 'Enter') return
+              event.preventDefault()
+              submitNewRoom()
+            }}
             className="flex-1 rounded-xl border border-slate-600 bg-slate-800 px-4 py-3 text-slate-100"
           />
           <button
