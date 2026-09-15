@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    name: Lint, build & tests Vitest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npx prettier --check .
+      - run: npm run build
+      # The storybook Vitest project renders stories in headless Chromium
+      - run: npx playwright install --with-deps chromium
+      # Separate runs: fake-indexeddb tests are load-sensitive when everything runs at once
+      - run: npm run test:units
+      - run: npm run test:integration
+      - run: npm run test:stories
+
+  e2e:
+    name: Tests end-to-end Playwright
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v6
+        if: failure()
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7
