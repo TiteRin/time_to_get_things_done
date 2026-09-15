@@ -1,0 +1,34 @@
+name: Storybook preview
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+
+# One deployment at a time per PR: a newer push supersedes a pending one
+concurrency:
+  group: storybook-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  preview:
+    name: Déploiement du Storybook sur GitHub Pages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        if: github.event.action != 'closed'
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+        if: github.event.action != 'closed'
+      - run: npm run build-storybook
+        if: github.event.action != 'closed'
+      # Deploys to gh-pages/pr-preview/pr-<number>, comments the link on the PR, removes it on close
+      - uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: storybook-static
