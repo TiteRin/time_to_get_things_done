@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{n,t as r}from"./EquipmentTagInput-DszMGOuG.js";var i,a,o,s,c,l,u;function d(){return(d=e((()=>{n(),i=t(),{useArgs:a}=__STORYBOOK_MODULE_PREVIEW_API__,{fn:o}=__STORYBOOK_MODULE_TEST__,s={title:`Configuration/EquipmentTagInput`,component:r,args:{equipment:[{id:`balai`,name:`Balai`},{id:`aspirateur`,name:`Aspirateur`},{id:`chiffon`,name:`Chiffon`}],value:[],onChange:o(),onAddEquipment:o()},decorators:[e=>(0,i.jsx)(`div`,{className:`min-h-dvh bg-slate-900 p-6`,children:(0,i.jsx)(e,{})})],render:function(e){let[,t]=a();return(0,i.jsx)(r,{...e,onChange:n=>{e.onChange(n),t({value:n})}})}},c={},l={args:{value:[`balai`,`chiffon`]}},u=[`Empty`,`WithSelection`],c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{}`,...c.parameters?.docs?.source}}},l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{
+  args: {
+    value: ['balai', 'chiffon']
+  }
+}`,...l.parameters?.docs?.source}}}})))()}d();export{c as Empty,l as WithSelection,u as __namedExportsOrder,s as default};

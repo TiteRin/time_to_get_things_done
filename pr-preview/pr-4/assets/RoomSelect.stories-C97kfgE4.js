@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{n,t as r}from"./RoomSelect-dZgSgn2A.js";var i,a,o,s,c,l,u;function d(){return(d=e((()=>{n(),i=t(),{useArgs:a}=__STORYBOOK_MODULE_PREVIEW_API__,{fn:o}=__STORYBOOK_MODULE_TEST__,s={title:`Configuration/RoomSelect`,component:r,args:{rooms:[{id:`salon`,name:`Salon`},{id:`cuisine`,name:`Cuisine`},{id:`salle-de-bain`,name:`Salle de bain`}],onChange:o(),onAddRoom:o()},decorators:[e=>(0,i.jsx)(`div`,{className:`min-h-dvh bg-slate-900 p-6`,children:(0,i.jsx)(e,{})})],render:function(e){let[,t]=a();return(0,i.jsx)(r,{...e,onChange:n=>{e.onChange(n),t({value:n})}})}},c={},l={args:{value:`cuisine`}},u=[`Empty`,`Selected`],c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{}`,...c.parameters?.docs?.source}}},l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{
+  args: {
+    value: 'cuisine'
+  }
+}`,...l.parameters?.docs?.source}}}})))()}d();export{c as Empty,l as Selected,u as __namedExportsOrder,s as default};
