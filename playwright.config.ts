@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test'
 
-const PORT = 5173
+const PORT = 4173
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -18,7 +18,9 @@ export default defineConfig({
     { name: 'iphone-14', use: { ...devices['iPhone 14'], browserName: 'chromium' } },
   ],
   webServer: {
-    command: `npm run dev -- --port ${PORT} --strictPort`,
+    // The production build, not the dev server: Vite's dependency pre-bundling
+    // triggers a full page reload mid-test, which wipes the React state
+    command: `npm run build && npx vite preview --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
   },

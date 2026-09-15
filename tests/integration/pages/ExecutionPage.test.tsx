@@ -1,9 +1,34 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router'
-import { describe, expect, it } from 'vitest'
+import type { ReactNode } from 'react'
+import { MemoryRouter, Route, Routes } from 'react-router'
+import { beforeEach, describe, expect, it } from 'vitest'
+import type { TtgtdDatabase } from '@/db/database'
 import type { Task } from '@/domain/task'
 import { ExecutionPage } from '@/pages/ExecutionPage'
+import * as taskRepository from '@/repositories/taskRepository'
+import { saveLastList } from '@/storage/lastList'
+import { databaseWrapper, setupTestDatabases } from '../../helpers/testDatabase'
+
+const openDatabase = setupTestDatabases()
+
+beforeEach(() => window.localStorage.clear())
+
+function routedWrapper(db: TtgtdDatabase) {
+  const DatabaseWrapper = databaseWrapper(db)
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return (
+      <MemoryRouter initialEntries={['/execution']}>
+        <DatabaseWrapper>
+          <Routes>
+            <Route path="/" element={<h1>Écran de génération</h1>} />
+            <Route path="/execution" element={children} />
+          </Routes>
+        </DatabaseWrapper>
+      </MemoryRouter>
+    )
+  }
+}
 
 const tasks: Task[] = [
   { id: 'a', name: 'Faire la vaisselle', expectedDuration: 15, perceivedDifficulty: 'medium' },
@@ -36,11 +61,21 @@ describe('ExecutionPage', () => {
     expect(screen.getByRole('heading', { name: 'Session terminée' })).toBeInTheDocument()
   })
 
-  it('uses the sample tasks by default', () => {
-    render(<ExecutionPage />, { wrapper: MemoryRouter })
+  it('runs the last saved list, in its saved order', async () => {
+    const db = openDatabase()
+    const stored = await taskRepository.listTasks(db)
+    const findId = (name: string) => stored.find((task) => task.name === name)!.id
+    saveLastList([findId('Faire la vaisselle'), findId('Faire les litières')])
 
-    expect(
-      screen.getByRole('heading', { name: 'Passer le balai dans le salon' }),
-    ).toBeInTheDocument()
+    render(<ExecutionPage />, { wrapper: routedWrapper(db) })
+
+    expect(await screen.findByRole('heading', { name: 'Faire la vaisselle' })).toBeInTheDocument()
+    expect(screen.getByText('1 / 2')).toBeInTheDocument()
+  })
+
+  it('goes back to the generation screen without a saved list', async () => {
+    render(<ExecutionPage />, { wrapper: routedWrapper(openDatabase()) })
+
+    expect(await screen.findByRole('heading', { name: 'Écran de génération' })).toBeInTheDocument()
   })
 })

@@ -3,6 +3,12 @@ import { ValidationError } from './validation'
 
 export type Difficulty = 'easy' | 'medium' | 'hard'
 
+export const difficultyLabels: Record<Difficulty, string> = {
+  easy: 'Facile',
+  medium: 'Moyen',
+  hard: 'Difficile',
+}
+
 /** Only the name is required: a task is usable before the user configures anything else */
 export type Task = {
   id: string

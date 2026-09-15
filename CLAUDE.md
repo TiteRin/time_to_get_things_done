@@ -4,14 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-Scaffolded on 2026-09-14. First delivered slice: the **Exécution** screen (TDD), fed by hard-coded fixtures, ending on a placeholder end screen that dumps the raw timeline. Débriefing and PWA manifest/service worker are not built yet. In progress on `feat/configuration`: local persistence (Dexie) and the Configuration screen.
+Scaffolded on 2026-09-14. Delivered: the **Exécution** screen (placeholder end screen dumping the raw timeline), the **Configuration** screen (Dexie persistence), and the manual **Génération** screen (`feat/generation`): the root route, two steps (selection then drag-and-drop ordering via dnd-kit), last list saved to localStorage (`src/storage/lastList.ts`) and re-selected on the next visit; Démarrer navigates to `/execution`, which runs the saved list and redirects to `/` when it is empty. Débriefing and PWA manifest/service worker are not built yet.
 
 ## Commands
 
 - `npm run dev` — Vite dev server
 - `npm test` — Vitest watch mode, three projects: `units` and `integration` (jsdom) and `storybook` (every story rendered in headless Chromium, `play` functions run as tests)
 - `npm run test:run` — all Vitest projects once; `npm run test:units` / `test:integration` / `test:stories` for one project; `npx vitest run tests/units/domain/session.test.ts` for a single file
-- `npm run test:e2e` — Playwright (`tests/e2e/`), projects `pixel-7` and `iphone-14`; starts the dev server itself
+- `npm run test:e2e` — Playwright (`tests/e2e/`), projects `pixel-7` and `iphone-14`; builds the app and serves it with `vite preview` (**not** the dev server: Vite's dependency pre-bundling triggers a full page reload mid-test that wipes the React state)
 - The first Vitest run after a config/dependency change can fail with "Failed to connect to the browser session" (Vite re-optimizing deps); rerun it.
 - `npm run storybook` — Storybook on port 6006 (default viewport iPhone 14)
 - `npm run build` — `tsc -b` + Vite build
@@ -46,10 +46,11 @@ Tests never live next to source. They sit under `tests/<kind>/` and mirror the p
 - `tests/integration/<path>.test.tsx` — several real modules wired together, e.g. `tests/integration/app/App.test.tsx`
 - `tests/stories/<path>.stories.tsx` — Storybook stories, e.g. `tests/stories/components/ExecutionScreen.stories.tsx`
 - `tests/e2e/*.spec.ts` — Playwright user flows
-- `tests/setup.ts` — shared jsdom setup (jest-dom matchers, cleanup)
-- `src/fixtures/tasks.ts` — sample chores used by the execution screen until list creation exists.
+- `tests/setup.ts` — shared jsdom setup (jest-dom matchers, cleanup, working localStorage shim — Node 25's broken global shadows jsdom's — cleared after each test)
+- `src/fixtures/tasks.ts` — sample chores, now only used by stories.
 - Styling: Tailwind v4 (`@tailwindcss/vite`), imported in `src/index.css` (also loaded by `.storybook/preview.tsx`).
-- E2E tests use `page.clock.install` + `pauseAt` so timeline timestamps are deterministic.
+- E2E tests control time with `page.clock.setFixedTime` only: `clock.install`'s frozen timers stall Dexie's queries, so the screen never loads.
+- Pages must not render their content before every `useLiveQuery` they use has resolved (`!tasks || !rooms` → render nothing): rendering with partial data regroups the list when the rest arrives, swapping DOM nodes and losing taps.
 
 ## Execution semantics (decided)
 

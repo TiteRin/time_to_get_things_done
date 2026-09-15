@@ -1,11 +1,32 @@
-import { Link } from 'react-router'
+import { useState } from 'react'
+import { Link, Navigate } from 'react-router'
 import type { Task } from '@/domain/task'
 import { ExecutionScreen } from '@/components/ExecutionScreen'
 import { SessionEndScreen } from '@/components/SessionEndScreen'
 import { useSession } from '@/hooks/useSession'
-import { sampleTasks } from '@/fixtures/tasks'
+import { useTasks } from '@/hooks/useTasks'
+import { loadLastList } from '@/storage/lastList'
 
-export function ExecutionPage({ tasks = sampleTasks }: { tasks?: Task[] }) {
+export function ExecutionPage({ tasks }: { tasks?: Task[] }) {
+  return tasks ? <ExecutionSession tasks={tasks} /> : <LastListSession />
+}
+
+/** Runs the list saved by the Génération screen; the session itself is never persisted */
+function LastListSession() {
+  const { tasks } = useTasks()
+  // Read once: the session must not restart if the storage changes mid-run
+  const [ids] = useState(loadLastList)
+
+  if (!tasks) return null
+
+  const byId = new Map(tasks.map((task) => [task.id, task]))
+  const list = ids.flatMap((id) => byId.get(id) ?? [])
+  if (list.length === 0) return <Navigate to="/" replace />
+
+  return <ExecutionSession tasks={list} />
+}
+
+function ExecutionSession({ tasks }: { tasks: Task[] }) {
   const { state, currentTask, toggle, next, openMenu, closeMenu, finish } = useSession(tasks)
 
   if (state.status === 'ended' || !currentTask) {
@@ -14,9 +35,14 @@ export function ExecutionPage({ tasks = sampleTasks }: { tasks?: Task[] }) {
         tasks={state.tasks}
         timeline={state.timeline}
         footer={
-          <Link to="/configuration" className="font-medium text-emerald-400">
-            Configuration
-          </Link>
+          <div className="flex flex-col gap-2">
+            <Link to="/" className="font-medium text-emerald-400">
+              Nouvelle liste
+            </Link>
+            <Link to="/configuration" className="font-medium text-emerald-400">
+              Configuration
+            </Link>
+          </div>
         }
       />
     )

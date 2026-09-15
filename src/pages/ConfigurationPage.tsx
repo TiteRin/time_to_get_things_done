@@ -15,16 +15,20 @@ export function ConfigurationPage() {
   const { equipment, findOrCreateEquipment } = useEquipment()
   const [form, setForm] = useState<FormState>({ open: false })
 
+  // Rendering before the three live queries resolve would regroup the list under the
+  // user's finger once the rooms arrive, swapping the DOM nodes and losing the tap
+  const loading = !tasks || !rooms || !equipment
+
   return (
     <main className="min-h-dvh bg-slate-900 p-6">
       <h1 className="mb-6 text-xl font-semibold text-slate-100">Configuration</h1>
 
-      {form.open ? (
+      {loading ? null : form.open ? (
         <TaskForm
           key={form.task?.id ?? 'new'}
           task={form.task}
-          rooms={rooms ?? []}
-          equipment={equipment ?? []}
+          rooms={rooms}
+          equipment={equipment}
           onSubmit={async (input) => {
             await (form.task ? updateTask({ ...input, id: form.task.id }) : createTask(input))
             setForm({ open: false })
@@ -42,12 +46,12 @@ export function ConfigurationPage() {
             Ajouter une tâche
           </button>
           <TaskList
-            tasks={tasks ?? []}
-            rooms={rooms ?? []}
+            tasks={tasks}
+            rooms={rooms}
             onSelect={(task) => setForm({ open: true, task })}
           />
           <Link to="/" className="mt-6 block text-center font-medium text-emerald-400">
-            Lancer la session
+            Créer une liste
           </Link>
         </>
       )}
