@@ -1,9 +1,9 @@
 import { difficultyLabels } from '@/domain/task'
 import type { Difficulty } from '@/domain/task'
 
-const OPTIONS = (Object.entries(difficultyLabels) as [Difficulty, string][]).map(
-  ([value, label]) => ({ value, label }),
-)
+// Explicit order: easiest first
+const ORDER: Difficulty[] = ['easy', 'medium', 'hard']
+const OPTIONS = ORDER.map((value) => ({ value, label: difficultyLabels[value] }))
 
 export function DifficultyPicker({
   value,

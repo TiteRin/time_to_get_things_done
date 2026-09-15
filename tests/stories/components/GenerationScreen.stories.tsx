@@ -46,6 +46,7 @@ export const Ordonnancement: Story = {
 export const CatalogueLong: Story = {
   args: {
     step: 'select',
+    selected: [],
     tasks: Array.from({ length: 30 }, (_, i) => ({
       id: `extra-${i}`,
       name: `Tâche numéro ${i + 1}`,

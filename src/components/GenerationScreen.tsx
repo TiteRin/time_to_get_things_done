@@ -4,8 +4,8 @@ import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-
 import { CSS } from '@dnd-kit/utilities'
 import type { ReactNode } from 'react'
 import type { Equipment } from '@/domain/equipment'
-import { byName } from '@/domain/name'
 import type { Room } from '@/domain/room'
+import { groupTasksByRoom } from '@/domain/taskGrouping'
 import { difficultyLabels } from '@/domain/task'
 import type { Task } from '@/domain/task'
 import { totalExpectedDuration } from '@/domain/taskSelection'
@@ -66,7 +66,7 @@ export function GenerationScreen({
         )}
       </div>
 
-      <footer className="sticky bottom-0 -mx-6 mt-6 flex flex-col gap-4 border-t border-slate-800 bg-slate-900 px-6 pt-4 pb-6">
+      <footer className="sticky bottom-0 -mx-6 mt-6 flex flex-col gap-4 border-t border-slate-800 bg-slate-900 px-6 pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
         <p aria-live="polite" className="text-center text-sm text-slate-400">
           {summary}
         </p>
@@ -119,23 +119,13 @@ function SelectionList({
 }) {
   const selectedIds = new Set(selected.map((task) => task.id))
   const equipmentById = new Map(equipment.map((item) => [item.id, item.name]))
-
-  // Same grouping as the configuration TaskList: rooms sorted by name, roomless tasks last
-  const groups = [...[...rooms].sort(byName), { id: undefined, name: 'Aucune pièce' }]
-    .map((room) => ({
-      ...room,
-      tasks: tasks.filter((task) => task.roomId === room.id).sort(byName),
-    }))
-    .filter((group) => group.tasks.length > 0)
+  const groups = groupTasksByRoom(tasks, rooms)
 
   const details = (task: Task) =>
     [
-      task.expectedDuration !== undefined && `${task.expectedDuration} min`,
+      task.expectedDuration !== undefined ? `${task.expectedDuration} min` : undefined,
       task.perceivedDifficulty && difficultyLabels[task.perceivedDifficulty],
-      task.equipmentIds
-        ?.map((id) => equipmentById.get(id))
-        .filter(Boolean)
-        .join(', ') || false,
+      task.equipmentIds?.flatMap((id) => equipmentById.get(id) ?? []).join(', '),
     ]
       .filter(Boolean)
       .join(' · ')
@@ -148,22 +138,27 @@ function SelectionList({
           <ul className="flex flex-col divide-y divide-slate-700">
             {group.tasks.map((task) => {
               const isSelected = selectedIds.has(task.id)
+              const detail = details(task)
               return (
-                <li key={task.id} className="flex items-center gap-4 py-3">
+                // scroll-mb keeps a focused row visible above the sticky footer
+                <li key={task.id} className="flex scroll-mb-40 items-center gap-4 py-3">
                   <span className="flex-1">
                     <span
                       className={`block font-medium ${isSelected ? 'text-emerald-400' : 'text-slate-100'}`}
                     >
                       {task.name}
                     </span>
-                    {details(task) && (
-                      <span className="block text-sm text-slate-400">{details(task)}</span>
+                    {detail && (
+                      <span id={`task-details-${task.id}`} className="block text-sm text-slate-400">
+                        {detail}
+                      </span>
                     )}
                   </span>
                   <button
                     type="button"
                     onClick={() => onToggle(task.id)}
                     aria-pressed={isSelected}
+                    aria-describedby={detail ? `task-details-${task.id}` : undefined}
                     aria-label={`${isSelected ? 'Désélectionner' : 'Sélectionner'} ${task.name}`}
                     className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
                       isSelected

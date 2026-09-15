@@ -25,7 +25,8 @@ describe('ConfigurationPage', () => {
     render(<ConfigurationPage />, { wrapper: routedDatabaseWrapper(openDatabase()) })
 
     expect(await screen.findByText('Nettoyer les fontaines')).toBeInTheDocument()
-    expect(screen.getAllByText('Salon').length).toBeGreaterThan(0)
+    // The rooms live query can resolve after the tasks one
+    expect((await screen.findAllByText('Salon')).length).toBeGreaterThan(0)
   })
 
   it('creates a task from the form then shows it in the list', async () => {

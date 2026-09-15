@@ -28,9 +28,9 @@ describe('App', () => {
   it('shows the generation screen on the root route', async () => {
     renderAt('/')
 
-    expect(screen.getByRole('heading', { name: 'Choisir les tâches' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Choisir les tâches' })).toBeInTheDocument()
     expect(
-      await screen.findByRole('button', { name: 'Sélectionner Nettoyer les fontaines' }),
+      screen.getByRole('button', { name: 'Sélectionner Nettoyer les fontaines' }),
     ).toBeInTheDocument()
   })
 
@@ -57,7 +57,7 @@ describe('App', () => {
     const user = userEvent.setup()
     renderAt('/')
 
-    await user.click(screen.getByRole('link', { name: 'Configuration' }))
+    await user.click(await screen.findByRole('link', { name: 'Configuration' }))
 
     expect(screen.getByRole('heading', { name: 'Configuration' })).toBeInTheDocument()
   })
@@ -68,7 +68,7 @@ describe('App', () => {
 
     await user.click(screen.getByRole('link', { name: 'Créer une liste' }))
 
-    expect(screen.getByRole('heading', { name: 'Choisir les tâches' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Choisir les tâches' })).toBeInTheDocument()
   })
 
   it('navigates from the execution menu to the configuration page', async () => {
@@ -91,6 +91,6 @@ describe('App', () => {
     await user.click(screen.getByRole('button', { name: 'Terminer' }))
     await user.click(screen.getByRole('link', { name: 'Nouvelle liste' }))
 
-    expect(screen.getByRole('heading', { name: 'Choisir les tâches' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Choisir les tâches' })).toBeInTheDocument()
   })
 })

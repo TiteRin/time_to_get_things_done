@@ -16,8 +16,11 @@ export function GenerationPage() {
   const [step, setStep] = useState<GenerationStep>('select')
   const [selectedIds, setSelectedIds] = useState<string[]>(loadLastList)
 
-  const catalogue = tasks ?? []
-  const byId = new Map(catalogue.map((task) => [task.id, task]))
+  // Wait for the three live queries: rendering with partial data would make the
+  // grouped list jump around (and lose taps) once the rooms arrive
+  if (!tasks || !rooms || !equipment) return null
+
+  const byId = new Map(tasks.map((task) => [task.id, task]))
   // The last saved list may reference tasks deleted since
   const validIds = selectedIds.filter((id) => byId.has(id))
   const selected = validIds.map((id) => byId.get(id)!)
@@ -25,9 +28,9 @@ export function GenerationPage() {
   return (
     <GenerationScreen
       step={step}
-      tasks={catalogue}
-      rooms={rooms ?? []}
-      equipment={equipment ?? []}
+      tasks={tasks}
+      rooms={rooms}
+      equipment={equipment}
       selected={selected}
       onToggle={(id) => setSelectedIds(toggleId(validIds, id))}
       onRemove={(id) => setSelectedIds(validIds.filter((selectedId) => selectedId !== id))}

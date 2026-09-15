@@ -1,6 +1,6 @@
 import type { Room } from '@/domain/room'
 import type { Task } from '@/domain/task'
-import { byName } from '@/domain/name'
+import { groupTasksByRoom } from '@/domain/taskGrouping'
 
 export function TaskList({
   tasks,
@@ -11,12 +11,7 @@ export function TaskList({
   rooms: Room[]
   onSelect?: (task: Task) => void
 }) {
-  const groups = [...[...rooms].sort(byName), { id: undefined, name: 'Aucune pièce' }]
-    .map((room) => ({
-      ...room,
-      tasks: tasks.filter((task) => task.roomId === room.id).sort(byName),
-    }))
-    .filter((group) => group.tasks.length > 0)
+  const groups = groupTasksByRoom(tasks, rooms)
 
   return (
     <div className="flex flex-col gap-6">

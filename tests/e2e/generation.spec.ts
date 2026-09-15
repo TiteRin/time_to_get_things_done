@@ -53,6 +53,7 @@ test('cannot start with an empty selection and redirects to the generation scree
 }) => {
   await page.goto('/')
   await expect(page.getByRole('button', { name: 'Démarrer' })).toBeDisabled()
+  await expect(page.getByRole('heading', { name: 'Salon' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Étape suivante' })).toBeDisabled()
 
   // Reaching /execution without a saved list goes back to the generation screen
