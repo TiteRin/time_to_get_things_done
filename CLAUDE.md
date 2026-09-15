@@ -14,6 +14,7 @@ Scaffolded on 2026-09-14. Delivered: the **Exécution** screen (placeholder end 
 - `npm run test:e2e` — Playwright (`tests/e2e/`), projects `pixel-7` and `iphone-14`; builds the app and serves it with `vite preview` (**not** the dev server: Vite's dependency pre-bundling triggers a full page reload mid-test that wipes the React state)
 - The first Vitest run after a config/dependency change can fail with "Failed to connect to the browser session" (Vite re-optimizing deps); rerun it.
 - `npm run storybook` — Storybook on port 6006 (default viewport iPhone 14)
+- `npm run build-storybook` — static Storybook in `storybook-static/`; the `storybook-preview` workflow publishes it for each PR on GitHub Pages (`gh-pages` branch, `pr-preview/pr-<number>/`), comments the link and removes it when the PR closes
 - `npm run build` — `tsc -b` + Vite build
 - `npm run lint` — oxlint; `npm run format` — Prettier (Markdown files are ignored)
 
