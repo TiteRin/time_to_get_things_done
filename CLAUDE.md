@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-Scaffolded on 2026-09-14. First delivered slice: the **Exécution** screen (TDD), fed by hard-coded fixtures, ending on a placeholder end screen that dumps the raw timeline. Débriefing and PWA manifest/service worker are not built yet. In progress on `feat/configuration`: local persistence (Dexie) and the Configuration screen.
+Scaffolded on 2026-09-14. Delivered: the **Exécution** screen (placeholder end screen dumping the raw timeline), the **Configuration** screen (Dexie persistence), and the manual **Génération** screen (`feat/generation`): the root route, two steps (selection then drag-and-drop ordering via dnd-kit), last list saved to localStorage (`src/storage/lastList.ts`) and re-selected on the next visit; Démarrer navigates to `/execution`, which runs the saved list and redirects to `/` when it is empty. Débriefing and PWA manifest/service worker are not built yet.
 
 ## Commands
 

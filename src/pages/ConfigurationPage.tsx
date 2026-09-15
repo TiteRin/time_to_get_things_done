@@ -47,7 +47,7 @@ export function ConfigurationPage() {
             onSelect={(task) => setForm({ open: true, task })}
           />
           <Link to="/" className="mt-6 block text-center font-medium text-emerald-400">
-            Lancer la session
+            Créer une liste
           </Link>
         </>
       )}

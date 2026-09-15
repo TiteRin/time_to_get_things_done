@@ -31,15 +31,15 @@ L'utilisateur configure ses tâches ménagères (nom, durée prévue, difficult�
 
 ## Statut
 
-Projet à l'état de brief — aucun code n'a encore été écrit.
+MVP en cours : configuration des tâches, création manuelle de liste et écran d'exécution sont fonctionnels. La dernière liste créée est mémorisée localement (localStorage) et resélectionnée à la prochaine visite.
 
 ## Prochaines étapes
 
-- [ ] Scaffolder le projet (Vite + React + TypeScript)
-- [ ] Définir le modèle de données des tâches (schéma IndexedDB)
-- [ ] Construire l'écran de configuration (CRUD tâches + liste prédéfinie)
-- [ ] Construire l'écran de création de liste manuelle (sans génération automatique pour le MVP)
-- [ ] Construire l'écran d'exécution plein écran (tap/swipe, chronomètre, timeline d'actions)
+- [x] Scaffolder le projet (Vite + React + TypeScript)
+- [x] Définir le modèle de données des tâches (schéma IndexedDB)
+- [x] Construire l'écran de configuration (CRUD tâches + liste prédéfinie)
+- [x] Construire l'écran de création de liste manuelle (sélection, tri par glisser-déposer — sans génération automatique pour le MVP)
+- [x] Construire l'écran d'exécution plein écran (tap/swipe, chronomètre, timeline d'actions)
 - [ ] Construire l'écran de débriefing (temps prévu vs réel, mise à jour des estimations)
 - [ ] Rendre l'app installable en PWA (manifest, service worker)
 - [ ] Une fois le MVP validé : écran de génération filtrée/optimisée, historique des sessions, planification
