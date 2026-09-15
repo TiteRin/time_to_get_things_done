@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router'
 import { describe, expect, it } from 'vitest'
 import type { Task } from '@/domain/task'
 import { ExecutionPage } from '@/pages/ExecutionPage'
@@ -12,7 +13,7 @@ const tasks: Task[] = [
 describe('ExecutionPage', () => {
   it('runs through every task then shows the end screen', async () => {
     const user = userEvent.setup()
-    render(<ExecutionPage tasks={tasks} />)
+    render(<ExecutionPage tasks={tasks} />, { wrapper: MemoryRouter })
 
     expect(screen.getByRole('heading', { name: 'Faire la vaisselle' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Démarrer' }))
@@ -27,7 +28,7 @@ describe('ExecutionPage', () => {
 
   it('ends the session early from the top menu', async () => {
     const user = userEvent.setup()
-    render(<ExecutionPage tasks={tasks} />)
+    render(<ExecutionPage tasks={tasks} />, { wrapper: MemoryRouter })
 
     await user.click(screen.getByRole('button', { name: 'Afficher le menu' }))
     await user.click(screen.getByRole('button', { name: 'Terminer' }))
@@ -36,7 +37,7 @@ describe('ExecutionPage', () => {
   })
 
   it('uses the sample tasks by default', () => {
-    render(<ExecutionPage />)
+    render(<ExecutionPage />, { wrapper: MemoryRouter })
 
     expect(
       screen.getByRole('heading', { name: 'Passer le balai dans le salon' }),

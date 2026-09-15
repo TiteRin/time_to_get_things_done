@@ -1,3 +1,4 @@
+import { Link } from 'react-router'
 import type { Task } from '@/domain/task'
 import { ExecutionScreen } from '@/components/ExecutionScreen'
 import { SessionEndScreen } from '@/components/SessionEndScreen'
@@ -8,7 +9,17 @@ export function ExecutionPage({ tasks = sampleTasks }: { tasks?: Task[] }) {
   const { state, currentTask, toggle, next, openMenu, closeMenu, finish } = useSession(tasks)
 
   if (state.status === 'ended' || !currentTask) {
-    return <SessionEndScreen tasks={state.tasks} timeline={state.timeline} />
+    return (
+      <>
+        <SessionEndScreen tasks={state.tasks} timeline={state.timeline} />
+        <Link
+          to="/configuration"
+          className="block bg-slate-900 pb-6 text-center font-medium text-emerald-400"
+        >
+          Configuration
+        </Link>
+      </>
+    )
   }
 
   return (

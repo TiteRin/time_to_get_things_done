@@ -1,14 +1,28 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import type { ReactNode } from 'react'
+import { MemoryRouter } from 'react-router'
 import { describe, expect, it } from 'vitest'
+import type { TtgtdDatabase } from '@/db/database'
 import { ConfigurationPage } from '@/pages/ConfigurationPage'
 import { databaseWrapper, setupTestDatabases } from '../../helpers/testDatabase'
 
 const openDatabase = setupTestDatabases()
 
+function routedDatabaseWrapper(db: TtgtdDatabase) {
+  const DatabaseWrapper = databaseWrapper(db)
+  return function RoutedDatabaseWrapper({ children }: { children: ReactNode }) {
+    return (
+      <MemoryRouter>
+        <DatabaseWrapper>{children}</DatabaseWrapper>
+      </MemoryRouter>
+    )
+  }
+}
+
 describe('ConfigurationPage', () => {
   it('lists the stored tasks with their room', async () => {
-    render(<ConfigurationPage />, { wrapper: databaseWrapper(openDatabase()) })
+    render(<ConfigurationPage />, { wrapper: routedDatabaseWrapper(openDatabase()) })
 
     expect(await screen.findByText('Nettoyer les fontaines')).toBeInTheDocument()
     expect(screen.getAllByText('Salon').length).toBeGreaterThan(0)
@@ -17,7 +31,7 @@ describe('ConfigurationPage', () => {
   it('creates a task from the form then shows it in the list', async () => {
     const user = userEvent.setup()
     const db = openDatabase()
-    render(<ConfigurationPage />, { wrapper: databaseWrapper(db) })
+    render(<ConfigurationPage />, { wrapper: routedDatabaseWrapper(db) })
 
     await user.click(await screen.findByRole('button', { name: 'Ajouter une tâche' }))
     await user.type(screen.getByLabelText('Nom'), 'Arroser les plantes')
@@ -31,7 +45,7 @@ describe('ConfigurationPage', () => {
   it('edits a task tapped in the list', async () => {
     const user = userEvent.setup()
     const db = openDatabase()
-    render(<ConfigurationPage />, { wrapper: databaseWrapper(db) })
+    render(<ConfigurationPage />, { wrapper: routedDatabaseWrapper(db) })
 
     await user.click(await screen.findByRole('button', { name: /Nettoyer les fontaines/ }))
 

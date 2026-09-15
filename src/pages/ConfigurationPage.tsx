@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { TaskForm } from '@/components/TaskForm'
 import { TaskList } from '@/components/TaskList'
 import type { Task } from '@/domain/task'
@@ -45,6 +46,9 @@ export function ConfigurationPage() {
             rooms={rooms ?? []}
             onSelect={(task) => setForm({ open: true, task })}
           />
+          <Link to="/" className="mt-6 block text-center font-medium text-emerald-400">
+            Lancer la session
+          </Link>
         </>
       )}
     </main>
