@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { MemoryRouter, Route, Routes } from 'react-router'
@@ -14,7 +14,7 @@ const openDatabase = setupTestDatabases()
 
 beforeEach(() => window.localStorage.clear())
 
-function routedWrapper(db: TtgtdDatabase) {
+function routedWrapper(db: TtgtdDatabase = openDatabase()) {
   const DatabaseWrapper = databaseWrapper(db)
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
@@ -38,7 +38,7 @@ const tasks: Task[] = [
 describe('ExecutionPage', () => {
   it('runs through every task then shows the end screen', async () => {
     const user = userEvent.setup()
-    render(<ExecutionPage tasks={tasks} />, { wrapper: MemoryRouter })
+    render(<ExecutionPage tasks={tasks} />, { wrapper: routedWrapper() })
 
     expect(screen.getByRole('heading', { name: 'Faire la vaisselle' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Démarrer' }))
@@ -48,17 +48,17 @@ describe('ExecutionPage', () => {
     expect(screen.getByRole('button', { name: 'Démarrer' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Tâche suivante' }))
 
-    expect(screen.getByRole('heading', { name: 'Session terminée' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Bravo !' })).toBeInTheDocument()
   })
 
   it('ends the session early from the top menu', async () => {
     const user = userEvent.setup()
-    render(<ExecutionPage tasks={tasks} />, { wrapper: MemoryRouter })
+    render(<ExecutionPage tasks={tasks} />, { wrapper: routedWrapper() })
 
     await user.click(screen.getByRole('button', { name: 'Afficher le menu' }))
     await user.click(screen.getByRole('button', { name: 'Terminer' }))
 
-    expect(screen.getByRole('heading', { name: 'Session terminée' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Bravo !' })).toBeInTheDocument()
   })
 
   it('runs the last saved list, in its saved order', async () => {
@@ -71,6 +71,40 @@ describe('ExecutionPage', () => {
 
     expect(await screen.findByRole('heading', { name: 'Faire la vaisselle' })).toBeInTheDocument()
     expect(screen.getByText('1 / 2')).toBeInTheDocument()
+  })
+
+  it('updates the expected duration from the debriefing, then closes it', async () => {
+    const user = userEvent.setup()
+    const db = openDatabase()
+    const stored = await taskRepository.listTasks(db)
+    const dishes = stored.find((task) => task.name === 'Faire la vaisselle')!
+    saveLastList([dishes.id])
+
+    render(<ExecutionPage />, { wrapper: routedWrapper(db) })
+
+    await user.click(await screen.findByRole('button', { name: 'Démarrer' }))
+    await user.click(screen.getByRole('button', { name: 'Tâche suivante' }))
+    expect(
+      await screen.findByText('1 tâche effectuée sur 1, temps passé : 0 minute'),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Faire la vaisselle' }))
+    await user.click(screen.getByRole('button', { name: 'Modifier la durée prévue' }))
+    const input = screen.getByRole('spinbutton', { name: 'Durée prévue (minutes)' })
+    await user.clear(input)
+    await user.type(input, '12')
+    await user.click(screen.getByRole('button', { name: 'Enregistrer' }))
+
+    await waitFor(async () => expect((await db.tasks.get(dishes.id))?.expectedDuration).toBe(12))
+    expect(
+      await within(screen.getByRole('dialog')).findByRole('button', {
+        name: 'Modifier la durée prévue',
+      }),
+    ).toHaveTextContent('12 min')
+
+    await user.click(screen.getByRole('button', { name: 'Fermer le détail' }))
+    await user.click(screen.getByRole('button', { name: 'Fermer' }))
+    expect(await screen.findByRole('heading', { name: 'Écran de génération' })).toBeInTheDocument()
   })
 
   it('goes back to the generation screen without a saved list', async () => {
