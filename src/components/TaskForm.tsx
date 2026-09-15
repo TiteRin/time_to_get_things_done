@@ -24,7 +24,7 @@ export function TaskForm({
   task?: Task
   rooms: Room[]
   equipment: Equipment[]
-  onSubmit: (task: Omit<Task, 'id'>) => void
+  onSubmit: (task: Omit<Task, 'id'>) => void | Promise<unknown>
   onAddRoom: (name: string) => Promise<Room>
   onAddEquipment: (name: string) => Promise<Equipment>
 }) {
@@ -37,25 +37,39 @@ export function TaskForm({
   const [roomId, setRoomId] = useState(task?.roomId)
   const [equipmentIds, setEquipmentIds] = useState(task?.equipmentIds ?? [])
   const [error, setError] = useState<string>()
+  // Persistence failures cannot reach the error boundary from an event handler; rethrow while rendering
+  const [unexpected, setUnexpected] = useState<unknown>()
   // Entities created from the form may not be in the live lists yet; keep them so they render
   const [addedRooms, setAddedRooms] = useState<Room[]>([])
   const [addedEquipment, setAddedEquipment] = useState<Equipment[]>([])
 
+  if (unexpected !== undefined) throw unexpected
+
   const addRoom = async (roomName: string) => {
-    const room = await onAddRoom(roomName)
-    setAddedRooms((previous) => [...previous, room])
-    setRoomId(room.id)
+    try {
+      const room = await onAddRoom(roomName)
+      setAddedRooms((previous) => [...previous, room])
+      setRoomId(room.id)
+    } catch (thrown) {
+      setUnexpected(thrown)
+    }
   }
 
   const addEquipment = async (equipmentName: string) => {
-    const item = await onAddEquipment(equipmentName)
-    setAddedEquipment((previous) => [...previous, item])
-    setEquipmentIds((previous) => (previous.includes(item.id) ? previous : [...previous, item.id]))
+    try {
+      const item = await onAddEquipment(equipmentName)
+      setAddedEquipment((previous) => [...previous, item])
+      setEquipmentIds((previous) =>
+        previous.includes(item.id) ? previous : [...previous, item.id],
+      )
+    } catch (thrown) {
+      setUnexpected(thrown)
+    }
   }
 
-  const submit = () => {
+  const submit = async () => {
     try {
-      onSubmit(
+      await onSubmit(
         normalizeTask({
           name,
           expectedDuration,
@@ -66,8 +80,8 @@ export function TaskForm({
       )
       setError(undefined)
     } catch (thrown) {
-      if (!(thrown instanceof ValidationError)) throw thrown
-      setError(thrown.message)
+      if (thrown instanceof ValidationError) setError(thrown.message)
+      else setUnexpected(thrown)
     }
   }
 
@@ -75,7 +89,7 @@ export function TaskForm({
     <form
       onSubmit={(event) => {
         event.preventDefault()
-        submit()
+        void submit()
       }}
       className="flex flex-col gap-6"
     >

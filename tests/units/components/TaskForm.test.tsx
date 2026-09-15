@@ -1,8 +1,9 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import type { Equipment } from '@/domain/equipment'
 import type { Room } from '@/domain/room'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { TaskForm } from '@/components/TaskForm'
 
 const rooms: Room[] = [
@@ -153,6 +154,65 @@ describe('TaskForm', () => {
     expect(onSubmit).toHaveBeenCalledWith({
       name: 'Laver le sol',
       equipmentIds: ['equipment-Serpillière'],
+    })
+  })
+
+  describe('unexpected persistence failures reach the error boundary', () => {
+    function setupInBoundary(props: Partial<React.ComponentProps<typeof TaskForm>> = {}) {
+      // React logs the caught error; keep the test output clean
+      vi.spyOn(console, 'error').mockImplementation(() => {})
+      render(
+        <ErrorBoundary>
+          <TaskForm
+            rooms={rooms}
+            equipment={equipment}
+            onSubmit={vi.fn()}
+            onAddRoom={vi.fn(async (name: string): Promise<Room> => ({ id: `room-${name}`, name }))}
+            onAddEquipment={vi.fn(async (name: string): Promise<Equipment> => ({
+              id: `equipment-${name}`,
+              name,
+            }))}
+            {...props}
+          />
+        </ErrorBoundary>,
+      )
+    }
+
+    it('when saving the task fails', async () => {
+      setupInBoundary({ onSubmit: vi.fn().mockRejectedValue(new Error('Tâche introuvable')) })
+
+      await userEvent.type(screen.getByRole('textbox', { name: 'Nom' }), 'Laver le sol')
+      await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+
+      expect(
+        await screen.findByRole('heading', { name: 'Une erreur est survenue' }),
+      ).toBeInTheDocument()
+    })
+
+    it('when creating a room fails', async () => {
+      setupInBoundary({ onAddRoom: vi.fn().mockRejectedValue(new Error('boom')) })
+
+      await userEvent.click(screen.getByRole('button', { name: 'Nouvelle pièce' }))
+      const input = screen.getByRole('textbox', { name: 'Nom de la pièce' })
+      await userEvent.type(input, 'Bureau')
+      await userEvent.click(within(input.closest('div')!).getByRole('button', { name: 'Ajouter' }))
+
+      expect(
+        await screen.findByRole('heading', { name: 'Une erreur est survenue' }),
+      ).toBeInTheDocument()
+    })
+
+    it('when creating equipment fails', async () => {
+      setupInBoundary({ onAddEquipment: vi.fn().mockRejectedValue(new Error('boom')) })
+
+      await userEvent.type(
+        screen.getByRole('textbox', { name: 'Ajouter du matériel' }),
+        'Serpillière{enter}',
+      )
+
+      expect(
+        await screen.findByRole('heading', { name: 'Une erreur est survenue' }),
+      ).toBeInTheDocument()
     })
   })
 })

@@ -25,8 +25,8 @@ export function ConfigurationPage() {
           task={form.task}
           rooms={rooms ?? []}
           equipment={equipment ?? []}
-          onSubmit={(input) => {
-            void (form.task ? updateTask({ ...input, id: form.task.id }) : createTask(input))
+          onSubmit={async (input) => {
+            await (form.task ? updateTask({ ...input, id: form.task.id }) : createTask(input))
             setForm({ open: false })
           }}
           onAddRoom={findOrCreateRoom}
