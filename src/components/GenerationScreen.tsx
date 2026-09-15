@@ -62,7 +62,12 @@ export function GenerationScreen({
             onToggle={onToggle}
           />
         ) : (
-          <OrderingList selected={selected} onRemove={onRemove} onReorder={onReorder} />
+          <OrderingList
+            selected={selected}
+            rooms={rooms}
+            onRemove={onRemove}
+            onReorder={onReorder}
+          />
         )}
       </div>
 
@@ -121,14 +126,19 @@ function SelectionList({
   const equipmentById = new Map(equipment.map((item) => [item.id, item.name]))
   const groups = groupTasksByRoom(tasks, rooms)
 
-  const details = (task: Task) =>
-    [
-      task.expectedDuration !== undefined ? `${task.expectedDuration} min` : undefined,
-      task.perceivedDifficulty && difficultyLabels[task.perceivedDifficulty],
-      task.equipmentIds?.flatMap((id) => equipmentById.get(id) ?? []).join(', '),
+  // Duration and difficulty are always labelled, even when not filled in yet
+  const details = (task: Task) => {
+    const equipmentNames = task.equipmentIds
+      ?.flatMap((id) => equipmentById.get(id) ?? [])
+      .join(', ')
+    return [
+      `Durée : ${task.expectedDuration !== undefined ? `${task.expectedDuration} min` : 'non renseignée'}`,
+      `Difficulté : ${task.perceivedDifficulty ? difficultyLabels[task.perceivedDifficulty] : 'non renseignée'}`,
+      equipmentNames && `Matériel : ${equipmentNames}`,
     ]
       .filter(Boolean)
       .join(' · ')
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -138,7 +148,6 @@ function SelectionList({
           <ul className="flex flex-col divide-y divide-slate-700">
             {group.tasks.map((task) => {
               const isSelected = selectedIds.has(task.id)
-              const detail = details(task)
               return (
                 // scroll-mb keeps a focused row visible above the sticky footer
                 <li key={task.id} className="flex scroll-mb-40 items-center gap-4 py-3">
@@ -148,17 +157,15 @@ function SelectionList({
                     >
                       {task.name}
                     </span>
-                    {detail && (
-                      <span id={`task-details-${task.id}`} className="block text-sm text-slate-400">
-                        {detail}
-                      </span>
-                    )}
+                    <span id={`task-details-${task.id}`} className="block text-sm text-slate-400">
+                      {details(task)}
+                    </span>
                   </span>
                   <button
                     type="button"
                     onClick={() => onToggle(task.id)}
                     aria-pressed={isSelected}
-                    aria-describedby={detail ? `task-details-${task.id}` : undefined}
+                    aria-describedby={`task-details-${task.id}`}
                     aria-label={`${isSelected ? 'Désélectionner' : 'Sélectionner'} ${task.name}`}
                     className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
                       isSelected
@@ -180,13 +187,16 @@ function SelectionList({
 
 function OrderingList({
   selected,
+  rooms,
   onRemove,
   onReorder,
 }: {
   selected: Task[]
+  rooms: Room[]
   onRemove: (id: string) => void
   onReorder: (from: number, to: number) => void
 }) {
+  const roomNameById = new Map(rooms.map((room) => [room.id, room.name]))
   // A small drag threshold keeps plain taps on the remove buttons working
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
@@ -216,6 +226,7 @@ function OrderingList({
             <OrderingItem
               key={task.id}
               task={task}
+              roomName={(task.roomId && roomNameById.get(task.roomId)) || 'Aucune pièce'}
               index={index}
               onRemove={onRemove}
               onReorder={onReorder}
@@ -229,11 +240,13 @@ function OrderingList({
 
 function OrderingItem({
   task,
+  roomName,
   index,
   onRemove,
   onReorder,
 }: {
   task: Task
+  roomName: string
   index: number
   onRemove: (id: string) => void
   onReorder: (from: number, to: number) => void
@@ -260,7 +273,10 @@ function OrderingItem({
       >
         ⠿
       </button>
-      <span className="flex-1 font-medium text-slate-100">{task.name}</span>
+      <span className="flex-1">
+        <span className="block font-medium text-slate-100">{task.name}</span>
+        <span className="block text-sm text-slate-400">{roomName}</span>
+      </span>
       <button
         type="button"
         onClick={() => onRemove(task.id)}

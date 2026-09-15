@@ -31,7 +31,12 @@ L'utilisateur configure ses tâches ménagères (nom, durée prévue, difficult�
 
 ## Statut
 
-MVP en cours : configuration des tâches, création manuelle de liste et écran d'exécution sont fonctionnels. La dernière liste créée est mémorisée localement (localStorage) et resélectionnée à la prochaine visite.
+MVP en cours : configuration des tâches, création manuelle de liste et écran d'exécution sont fonctionnels.
+
+- **Création de liste en deux étapes** : sélection dans le catalogue groupé par pièce (durée, difficulté — avec libellé même quand l'information n'est pas renseignée — et matériel affichés sous chaque nom), puis réarrangement par glisser-déposer (la pièce de chaque tâche est rappelée sous son nom) avec retrait possible ; récapitulatif (nombre de tâches, durée approximative) et boutons toujours visibles en bas de l'écran.
+- **Persistance locale** : la dernière liste créée est mémorisée (localStorage) et resélectionnée à la prochaine visite ; le catalogue et les tâches configurées vivent dans IndexedDB.
+- **Exécution** : plein écran, une tâche à la fois, chronomètre silencieux, timeline des actions affichée sur l'écran de fin.
+- **Déploiement** : configuration wrangler pour servir la build en assets statiques sur Cloudflare (mode SPA).
 
 ## Prochaines étapes
 
@@ -43,6 +48,15 @@ MVP en cours : configuration des tâches, création manuelle de liste et écran 
 - [ ] Construire l'écran de débriefing (temps prévu vs réel, mise à jour des estimations)
 - [ ] Rendre l'app installable en PWA (manifest, service worker)
 - [ ] Une fois le MVP validé : écran de génération filtrée/optimisée, historique des sessions, planification
+
+## Nice to have
+
+Idées hors MVP, à prioriser plus tard.
+
+### UI/UX
+
+- [ ] Pouvoir associer un code couleur aux pièces
+- [ ] Pouvoir ajouter un emoji aux pièces
 
 ## Licence
 

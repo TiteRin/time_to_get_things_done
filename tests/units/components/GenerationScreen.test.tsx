@@ -61,9 +61,17 @@ describe('GenerationScreen, selection step', () => {
   it('shows the duration, difficulty and known equipment of each task', () => {
     render(<GenerationScreen {...baseProps} />)
 
-    expect(screen.getByText('15 min · Moyen · Éponge')).toBeVisible()
-    expect(screen.getByText('5 min')).toBeVisible()
+    expect(
+      screen.getByText('Durée : 15 min · Difficulté : Moyen · Matériel : Éponge'),
+    ).toBeVisible()
     expect(screen.queryByText(/introuvable/)).not.toBeInTheDocument()
+  })
+
+  it('labels missing duration and difficulty anyway', () => {
+    render(<GenerationScreen {...baseProps} />)
+
+    expect(screen.getByText('Durée : 5 min · Difficulté : non renseignée')).toBeVisible()
+    expect(screen.getByText('Durée : non renseignée · Difficulté : non renseignée')).toBeVisible()
   })
 
   it('reports a toggled task', async () => {
@@ -121,6 +129,14 @@ describe('GenerationScreen, ordering step', () => {
       expect.stringContaining('Faire la vaisselle'),
     ])
     expect(screen.queryByText('Ranger le salon')).not.toBeInTheDocument()
+  })
+
+  it('shows the room of each selected task, or the roomless label', () => {
+    render(<GenerationScreen {...orderProps} />)
+
+    const items = screen.getAllByRole('listitem')
+    expect(items[0].textContent).toContain('Aucune pièce')
+    expect(items[1].textContent).toContain('Cuisine')
   })
 
   it('reports a removed task', async () => {

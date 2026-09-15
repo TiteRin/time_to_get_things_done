@@ -42,6 +42,22 @@ export const Ordonnancement: Story = {
   args: { step: 'order' },
 }
 
+/**
+ * Catalogue de premier lancement : les tâches n'ont qu'un nom.
+ * Durée et difficulté restent affichées avec leur libellé « non renseignée ».
+ */
+export const SansInformations: Story = {
+  args: {
+    step: 'select',
+    selected: [],
+    tasks: [
+      { id: 'n1', name: 'Faire les poussières', roomId: 'salon' },
+      { id: 'n2', name: 'Faire la vaisselle', roomId: 'cuisine' },
+      { id: 'n3', name: 'Aspirer' },
+    ],
+  },
+}
+
 /** Long catalogue: the summary and buttons must stay visible while scrolling */
 export const CatalogueLong: Story = {
   args: {
