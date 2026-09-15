@@ -41,6 +41,16 @@ describe('App', () => {
     ).toBeInTheDocument()
   })
 
+  it('navigates from the execution menu to the configuration page', async () => {
+    const user = userEvent.setup()
+    renderAt('/')
+
+    await user.click(screen.getByRole('button', { name: 'Afficher le menu' }))
+    await user.click(screen.getByRole('link', { name: 'Configuration' }))
+
+    expect(screen.getByRole('heading', { name: 'Configuration' })).toBeInTheDocument()
+  })
+
   it('navigates from the session end screen to the configuration page', async () => {
     const user = userEvent.setup()
     renderAt('/')

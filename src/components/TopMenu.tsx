@@ -1,4 +1,14 @@
-export function TopMenu({ onCancel, onFinish }: { onCancel: () => void; onFinish: () => void }) {
+import type { ReactNode } from 'react'
+
+export function TopMenu({
+  onCancel,
+  onFinish,
+  children,
+}: {
+  onCancel: () => void
+  onFinish: () => void
+  children?: ReactNode
+}) {
   return (
     <div
       role="dialog"
@@ -20,6 +30,7 @@ export function TopMenu({ onCancel, onFinish }: { onCancel: () => void; onFinish
       >
         Annuler
       </button>
+      {children && <div className="mt-2 text-center">{children}</div>}
     </div>
   )
 }

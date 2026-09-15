@@ -34,6 +34,11 @@ export function ExecutionPage({ tasks = sampleTasks }: { tasks?: Task[] }) {
       onOpenMenu={openMenu}
       onCloseMenu={closeMenu}
       onFinish={finish}
+      menuExtra={
+        <Link to="/configuration" className="font-medium text-emerald-400">
+          Configuration
+        </Link>
+      }
     />
   )
 }

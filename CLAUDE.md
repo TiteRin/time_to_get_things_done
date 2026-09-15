@@ -55,7 +55,7 @@ Tests never live next to source. They sit under `tests/<kind>/` and mirror the p
 
 - Center tap: start / pause / resume. The elapsed time is never displayed.
 - Bottom tap or swipe up: current task is **done** (`complete` entry, even if never started), next task starts idle and waits for a tap. On the last task it ends the session.
-- Top tap: menu with **Terminer** (end session → end screen) and **Annuler** (close menu). The menu does not pause the timer; swipes are disabled while it is open.
+- Top tap: menu with **Terminer** (end session → end screen), **Annuler** (close menu) and a **Configuration** link. The menu does not pause the timer; swipes are disabled while it is open.
 - No session persistence: reloading loses the session.
 
 ## Project overview
