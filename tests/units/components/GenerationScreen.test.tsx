@@ -5,14 +5,30 @@ import type { Task } from '@/domain/task'
 import { GenerationScreen } from '@/components/GenerationScreen'
 
 const tasks: Task[] = [
-  { id: 'a', name: 'Faire la vaisselle', expectedDuration: 15 },
+  {
+    id: 'a',
+    name: 'Faire la vaisselle',
+    expectedDuration: 15,
+    perceivedDifficulty: 'medium',
+    roomId: 'cuisine',
+    equipmentIds: ['eponge', 'introuvable'],
+  },
   { id: 'b', name: 'Faire les litières', expectedDuration: 5 },
-  { id: 'c', name: 'Ranger le salon' },
+  { id: 'c', name: 'Ranger le salon', roomId: 'salon' },
 ]
+
+const rooms = [
+  { id: 'salon', name: 'Salon' },
+  { id: 'cuisine', name: 'Cuisine' },
+]
+
+const equipment = [{ id: 'eponge', name: 'Éponge' }]
 
 const baseProps = {
   step: 'select' as const,
   tasks,
+  rooms,
+  equipment,
   selected: [tasks[1], tasks[0]],
   onToggle: vi.fn(),
   onRemove: vi.fn(),
@@ -29,6 +45,25 @@ describe('GenerationScreen, selection step', () => {
     expect(screen.getByRole('button', { name: 'Désélectionner Faire la vaisselle' })).toBeVisible()
     expect(screen.getByRole('button', { name: 'Désélectionner Faire les litières' })).toBeVisible()
     expect(screen.getByRole('button', { name: 'Sélectionner Ranger le salon' })).toBeVisible()
+  })
+
+  it('groups the tasks by room, rooms sorted by name, roomless tasks last', () => {
+    render(<GenerationScreen {...baseProps} />)
+
+    const headings = screen.getAllByRole('heading', { level: 2 })
+    expect(headings.map((heading) => heading.textContent)).toEqual([
+      'Cuisine',
+      'Salon',
+      'Aucune pièce',
+    ])
+  })
+
+  it('shows the duration, difficulty and known equipment of each task', () => {
+    render(<GenerationScreen {...baseProps} />)
+
+    expect(screen.getByText('15 min · Moyen · Éponge')).toBeVisible()
+    expect(screen.getByText('5 min')).toBeVisible()
+    expect(screen.queryByText(/introuvable/)).not.toBeInTheDocument()
   })
 
   it('reports a toggled task', async () => {

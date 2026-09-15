@@ -1,10 +1,9 @@
+import { difficultyLabels } from '@/domain/task'
 import type { Difficulty } from '@/domain/task'
 
-const OPTIONS: { value: Difficulty; label: string }[] = [
-  { value: 'easy', label: 'Facile' },
-  { value: 'medium', label: 'Moyen' },
-  { value: 'hard', label: 'Difficile' },
-]
+const OPTIONS = (Object.entries(difficultyLabels) as [Difficulty, string][]).map(
+  ([value, label]) => ({ value, label }),
+)
 
 export function DifficultyPicker({
   value,

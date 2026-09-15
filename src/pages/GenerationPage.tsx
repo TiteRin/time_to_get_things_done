@@ -3,11 +3,15 @@ import { Link, useNavigate } from 'react-router'
 import { GenerationScreen } from '@/components/GenerationScreen'
 import type { GenerationStep } from '@/components/GenerationScreen'
 import { reorder, toggleId } from '@/domain/taskSelection'
+import { useEquipment } from '@/hooks/useEquipment'
+import { useRooms } from '@/hooks/useRooms'
 import { useTasks } from '@/hooks/useTasks'
 import { loadLastList, saveLastList } from '@/storage/lastList'
 
 export function GenerationPage() {
   const { tasks } = useTasks()
+  const { rooms } = useRooms()
+  const { equipment } = useEquipment()
   const navigate = useNavigate()
   const [step, setStep] = useState<GenerationStep>('select')
   const [selectedIds, setSelectedIds] = useState<string[]>(loadLastList)
@@ -22,6 +26,8 @@ export function GenerationPage() {
     <GenerationScreen
       step={step}
       tasks={catalogue}
+      rooms={rooms ?? []}
+      equipment={equipment ?? []}
       selected={selected}
       onToggle={(id) => setSelectedIds(toggleId(validIds, id))}
       onRemove={(id) => setSelectedIds(validIds.filter((selectedId) => selectedId !== id))}

@@ -37,6 +37,9 @@ describe('GenerationPage', () => {
       await screen.findByRole('button', { name: 'Sélectionner Nettoyer les fontaines' }),
     ).toBeInTheDocument()
     expect(screen.getByText('0 tâche sélectionnée, durée approximative ~ 0 minutes')).toBeVisible()
+    // Tasks are grouped under their room, like on the configuration screen
+    expect(screen.getByRole('heading', { name: 'Salon' })).toBeVisible()
+    expect(screen.getByRole('heading', { name: 'Aucune pièce' })).toBeVisible()
   })
 
   it('selects tasks, orders them on step two and removes one', async () => {

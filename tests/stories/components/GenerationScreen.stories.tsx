@@ -3,11 +3,20 @@ import { fn } from 'storybook/test'
 import { GenerationScreen } from '@/components/GenerationScreen'
 import { sampleTasks } from '@/fixtures/tasks'
 
+const rooms = [
+  { id: 'salon', name: 'Salon' },
+  { id: 'cuisine', name: 'Cuisine' },
+  { id: 'toilettes', name: 'Toilettes' },
+  { id: 'salle-de-bain', name: 'Salle de bain' },
+]
+
 const meta = {
   title: 'Génération/GenerationScreen',
   component: GenerationScreen,
   args: {
     tasks: sampleTasks,
+    rooms,
+    equipment: [],
     selected: [sampleTasks[3], sampleTasks[0], sampleTasks[5]],
     onToggle: fn(),
     onRemove: fn(),
@@ -31,4 +40,16 @@ export const SelectionVide: Story = {
 
 export const Ordonnancement: Story = {
   args: { step: 'order' },
+}
+
+/** Long catalogue: the summary and buttons must stay visible while scrolling */
+export const CatalogueLong: Story = {
+  args: {
+    step: 'select',
+    tasks: Array.from({ length: 30 }, (_, i) => ({
+      id: `extra-${i}`,
+      name: `Tâche numéro ${i + 1}`,
+      expectedDuration: 5,
+    })),
+  },
 }
