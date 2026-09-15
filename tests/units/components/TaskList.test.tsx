@@ -1,5 +1,6 @@
 import { render, screen, within } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
 import type { Room } from '@/domain/room'
 import type { Task } from '@/domain/task'
 import { TaskList } from '@/components/TaskList'
@@ -20,7 +21,7 @@ describe('TaskList', () => {
     render(<TaskList tasks={tasks} rooms={rooms} />)
 
     const items = screen.getAllByRole('listitem')
-    expect(items.map((item) => item.firstElementChild?.textContent)).toEqual([
+    expect(items.map((item) => item.querySelector('span')?.textContent)).toEqual([
       'Aspirer',
       'Épousseter',
       'Passer le balai',
@@ -50,5 +51,15 @@ describe('TaskList', () => {
       'Passer le balaiCuisine',
       'Passer le balaiSalon',
     ])
+  })
+
+  it('reports the tapped task', async () => {
+    const user = userEvent.setup()
+    const onSelect = vi.fn()
+    render(<TaskList tasks={tasks} rooms={rooms} onSelect={onSelect} />)
+
+    await user.click(screen.getByRole('button', { name: /Épousseter/ }))
+
+    expect(onSelect).toHaveBeenCalledWith(tasks[0])
   })
 })

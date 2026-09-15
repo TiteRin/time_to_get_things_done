@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { fn } from 'storybook/test'
 import { TaskList } from '@/components/TaskList'
 
 const rooms = [
@@ -9,7 +10,7 @@ const rooms = [
 const meta = {
   title: 'Configuration/TaskList',
   component: TaskList,
-  args: { rooms },
+  args: { rooms, onSelect: fn() },
   decorators: [
     (Story) => (
       <div className="min-h-dvh bg-slate-900 p-6">
