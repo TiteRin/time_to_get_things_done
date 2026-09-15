@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-Scaffolded on 2026-09-14. Delivered: the **Exécution** screen (placeholder end screen dumping the raw timeline), the **Configuration** screen (Dexie persistence), and the manual **Génération** screen (`feat/generation`): the root route, two steps (selection then drag-and-drop ordering via dnd-kit), last list saved to localStorage (`src/storage/lastList.ts`) and re-selected on the next visit; Démarrer navigates to `/execution`, which runs the saved list and redirects to `/` when it is empty. Débriefing and PWA manifest/service worker are not built yet.
+Scaffolded on 2026-09-14. Delivered: the **Exécution** screen, the **Configuration** screen (Dexie persistence), and the manual **Génération** screen (`feat/generation`): the root route, two steps (selection then drag-and-drop ordering via dnd-kit), last list saved to localStorage (`src/storage/lastList.ts`) and re-selected on the next visit; Démarrer navigates to `/execution`, which runs the saved list and redirects to `/` when it is empty. The **Débriefing** screen (`feat/debriefing`) replaces the old end screen when the session ends. The PWA manifest/service worker is not built yet.
 
 ## Commands
 
@@ -27,10 +27,11 @@ TDD: write the failing test first (Vitest for logic/hooks/components, a story pe
 
 Source is organized by technical kind (not by feature); add new top-level folders under `src/` as needs arise. Import across folders with the `@/` alias (→ `src/`), relative imports only within the same folder.
 
-- `src/domain/` — pure TypeScript, no React. `session.ts` is the execution state machine: `createSession`, `sessionReducer` (events carry an injected `at` timestamp — never call `Date.now()` in the reducer), and `actualDurationMs` (running time per task, for the future Débriefing). Invalid transitions return the same state object.
+- `src/domain/` — pure TypeScript, no React. `session.ts` is the execution state machine: `createSession`, `sessionReducer` (events carry an injected `at` timestamp — never call `Date.now()` in the reducer), and `actualDurationMs` (running time per task). Invalid transitions return the same state object.
+- `src/domain/debriefing.ts` — `timelineSegments` cuts the timeline into `work` / `pause` / `wait` segments (ms since the first event; each gap belongs to the task of the event closing it), `taskDurations` (total = work + pause, effective = work; waits never count), `sessionSummary` (a task is **done** only if it has both `start` and `complete`; elapsed = first → last event), `formatDuration`.
 - `src/hooks/` — `useSession` (wraps the reducer, injects the clock, `toggle` maps idle/running/paused to START/PAUSE/RESUME), `useSwipe` (pointer-event swipe-up detection that swallows the trailing click).
-- `src/components/` — presentational components (`ExecutionScreen`, `TopMenu`, `SessionEndScreen`) that take props + callbacks only.
-- `src/app/App.tsx` — wires `useSession` to the screens and switches to the end screen when the session is `ended`.
+- `src/components/` — presentational components (`ExecutionScreen`, `TopMenu`, `DebriefingScreen`, `TaskDebriefSheet`) that take props + callbacks only.
+- `src/app/App.tsx` — routes (`/` Génération, `/execution`, `/configuration`); `src/pages/ExecutionPage.tsx` wires `useSession` to the screens and switches to the debriefing when the session is `ended`.
 - `src/catalog/defaultCatalog.ts` — starter catalogue (task names + rooms, no equipment) copied into the user's database once, on first launch. Changing it only affects new users; existing copies are never touched.
 - `src/db/database.ts` — `TtgtdDatabase` (Dexie): `tasks`, `rooms`, `equipment` tables, seeded from the catalogue in the `populate` hook. Schema changes need a new `version()`. Unit tests use `fake-indexeddb` (loaded in `tests/setup.ts`) with a random database name per test.
 - **Id strategy**: catalogue entities use readable slugs (`cuisine-passer-le-balai`); everything the user creates gets `crypto.randomUUID()`. Never derive user ids from names.
@@ -58,6 +59,12 @@ Tests never live next to source. They sit under `tests/<kind>/` and mirror the p
 - Bottom tap or swipe up: current task is **done** (`complete` entry, even if never started), next task starts idle and waits for a tap. On the last task it ends the session.
 - Top tap: menu with **Terminer** (end session → end screen), **Annuler** (close menu) and a **Configuration** link. The menu does not pause the timer; swipes are disabled while it is open.
 - No session persistence: reloading loses the session.
+
+## Débriefing semantics (decided)
+
+- Pauses and waits (a task waiting for its first tap) are both hatched in the timeline and excluded from effective time; only started tasks have clickable blocks.
+- Editing the expected duration is prefilled with the effective duration and saved with `updateTask`; the perceived difficulty is saved too. The **actual** difficulty felt is kept in screen state only, until a session history exists.
+- `ExecutionPage` feeds the debriefing with the stored version of each session task (live query) so edits show up at once.
 
 ## Project overview
 

@@ -31,11 +31,12 @@ L'utilisateur configure ses tâches ménagères (nom, durée prévue, difficult�
 
 ## Statut
 
-MVP en cours : configuration des tâches, création manuelle de liste et écran d'exécution sont fonctionnels.
+MVP fonctionnel : configuration des tâches, création manuelle de liste, écran d'exécution et débriefing. Reste à rendre l'app installable (PWA).
 
 - **Création de liste en deux étapes** : sélection dans le catalogue groupé par pièce (durée, difficulté — avec libellé même quand l'information n'est pas renseignée — et matériel affichés sous chaque nom), puis réarrangement par glisser-déposer (la pièce de chaque tâche est rappelée sous son nom) avec retrait possible ; récapitulatif (nombre de tâches, durée approximative) et boutons toujours visibles en bas de l'écran.
 - **Persistance locale** : la dernière liste créée est mémorisée (localStorage) et resélectionnée à la prochaine visite ; le catalogue et les tâches configurées vivent dans IndexedDB.
-- **Exécution** : plein écran, une tâche à la fois, chronomètre silencieux, timeline des actions affichée sur l'écran de fin.
+- **Exécution** : plein écran, une tâche à la fois, chronomètre silencieux, chaque action enregistrée dans une timeline.
+- **Débriefing** : félicitations, timeline façon agenda (un bloc par segment, hauteur proportionnelle à la durée, pauses et attentes hachurées), détail d'une tâche dans une modale (durée totale, effective, prévue, difficulté) avec correction de la durée prévue (préremplie avec la durée effective) et de la difficulté perçue ; la difficulté réelle ressentie se saisit mais n'est pas encore conservée. Résumé en bas de page et retour à l'accueil.
 - **Déploiement** : configuration wrangler pour servir la build en assets statiques sur Cloudflare (mode SPA).
 
 ## Prochaines étapes
@@ -45,7 +46,7 @@ MVP en cours : configuration des tâches, création manuelle de liste et écran 
 - [x] Construire l'écran de configuration (CRUD tâches + liste prédéfinie)
 - [x] Construire l'écran de création de liste manuelle (sélection, tri par glisser-déposer — sans génération automatique pour le MVP)
 - [x] Construire l'écran d'exécution plein écran (tap/swipe, chronomètre, timeline d'actions)
-- [ ] Construire l'écran de débriefing (temps prévu vs réel, mise à jour des estimations)
+- [x] Construire l'écran de débriefing (temps prévu vs réel, mise à jour des estimations)
 - [ ] Rendre l'app installable en PWA (manifest, service worker)
 - [ ] Une fois le MVP validé : écran de génération filtrée/optimisée, historique des sessions, planification
 
