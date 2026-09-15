@@ -10,15 +10,15 @@ export function ExecutionPage({ tasks = sampleTasks }: { tasks?: Task[] }) {
 
   if (state.status === 'ended' || !currentTask) {
     return (
-      <>
-        <SessionEndScreen tasks={state.tasks} timeline={state.timeline} />
-        <Link
-          to="/configuration"
-          className="block bg-slate-900 pb-6 text-center font-medium text-emerald-400"
-        >
-          Configuration
-        </Link>
-      </>
+      <SessionEndScreen
+        tasks={state.tasks}
+        timeline={state.timeline}
+        footer={
+          <Link to="/configuration" className="font-medium text-emerald-400">
+            Configuration
+          </Link>
+        }
+      />
     )
   }
 
