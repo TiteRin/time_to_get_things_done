@@ -14,43 +14,34 @@ const tasks: Task[] = [
   { id: 't1', name: 'Épousseter', roomId: 'salon' },
   { id: 't2', name: 'Aspirer' },
   { id: 't3', name: 'Passer le balai', roomId: 'cuisine' },
+  { id: 't4', name: 'Balayer', roomId: 'salon' },
 ]
 
 describe('TaskList', () => {
-  it('lists the tasks sorted by name, ignoring accents', () => {
+  it('groups the tasks by room, rooms sorted by name, roomless tasks last', () => {
     render(<TaskList tasks={tasks} rooms={rooms} />)
 
-    const items = screen.getAllByRole('listitem')
-    expect(items.map((item) => item.querySelector('span')?.textContent)).toEqual([
-      'Aspirer',
-      'Épousseter',
-      'Passer le balai',
+    const headings = screen.getAllByRole('heading')
+    expect(headings.map((heading) => heading.textContent)).toEqual([
+      'Cuisine',
+      'Salon',
+      'Aucune pièce',
     ])
   })
 
-  it('shows the room under the task name', () => {
+  it('sorts the tasks by name inside each group, ignoring accents', () => {
     render(<TaskList tasks={tasks} rooms={rooms} />)
 
-    const item = screen.getByText('Épousseter').closest('li')!
-    expect(within(item).getByText('Salon')).toBeInTheDocument()
+    const salon = screen.getByRole('heading', { name: 'Salon' }).closest('section')!
+    const items = within(salon).getAllByRole('listitem')
+    expect(items.map((item) => item.textContent)).toEqual(['Balayer', 'Épousseter'])
   })
 
-  it('distinguishes two tasks with the same name by their room', () => {
-    render(
-      <TaskList
-        tasks={[
-          { id: 't1', name: 'Passer le balai', roomId: 'salon' },
-          { id: 't2', name: 'Passer le balai', roomId: 'cuisine' },
-        ]}
-        rooms={rooms}
-      />,
-    )
+  it('leaves out rooms without any task', () => {
+    render(<TaskList tasks={[{ id: 't1', name: 'Épousseter', roomId: 'salon' }]} rooms={rooms} />)
 
-    const items = screen.getAllByRole('listitem')
-    expect(items.map((item) => item.textContent).sort()).toEqual([
-      'Passer le balaiCuisine',
-      'Passer le balaiSalon',
-    ])
+    expect(screen.queryByRole('heading', { name: 'Cuisine' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Aucune pièce' })).not.toBeInTheDocument()
   })
 
   it('reports the tapped task', async () => {
@@ -58,7 +49,7 @@ describe('TaskList', () => {
     const onSelect = vi.fn()
     render(<TaskList tasks={tasks} rooms={rooms} onSelect={onSelect} />)
 
-    await user.click(screen.getByRole('button', { name: /Épousseter/ }))
+    await user.click(screen.getByRole('button', { name: 'Épousseter' }))
 
     expect(onSelect).toHaveBeenCalledWith(tasks[0])
   })

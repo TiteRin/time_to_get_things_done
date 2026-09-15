@@ -11,24 +11,33 @@ export function TaskList({
   rooms: Room[]
   onSelect?: (task: Task) => void
 }) {
-  const roomName = (roomId?: string) => rooms.find((room) => room.id === roomId)?.name
+  const groups = [...[...rooms].sort(byName), { id: undefined, name: 'Aucune pièce' }]
+    .map((room) => ({
+      ...room,
+      tasks: tasks.filter((task) => task.roomId === room.id).sort(byName),
+    }))
+    .filter((group) => group.tasks.length > 0)
 
   return (
-    <ul className="flex flex-col divide-y divide-slate-700">
-      {[...tasks].sort(byName).map((task) => (
-        <li key={task.id}>
-          <button
-            type="button"
-            onClick={() => onSelect?.(task)}
-            className="flex w-full flex-col gap-1 py-3 text-left"
-          >
-            <span className="font-medium text-slate-100">{task.name}</span>
-            {roomName(task.roomId) && (
-              <span className="text-sm text-slate-400">{roomName(task.roomId)}</span>
-            )}
-          </button>
-        </li>
+    <div className="flex flex-col gap-6">
+      {groups.map((group) => (
+        <section key={group.id ?? 'no-room'}>
+          <h2 className="mb-1 text-sm font-medium text-slate-400">{group.name}</h2>
+          <ul className="flex flex-col divide-y divide-slate-700">
+            {group.tasks.map((task) => (
+              <li key={task.id}>
+                <button
+                  type="button"
+                  onClick={() => onSelect?.(task)}
+                  className="w-full py-3 text-left font-medium text-slate-100"
+                >
+                  {task.name}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
       ))}
-    </ul>
+    </div>
   )
 }
