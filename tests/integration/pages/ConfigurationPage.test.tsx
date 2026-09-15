@@ -27,4 +27,22 @@ describe('ConfigurationPage', () => {
     expect(screen.queryByLabelText('Nom')).not.toBeInTheDocument()
     expect(await db.tasks.filter((task) => task.name === 'Arroser les plantes').count()).toBe(1)
   })
+
+  it('edits a task tapped in the list', async () => {
+    const user = userEvent.setup()
+    const db = openDatabase()
+    render(<ConfigurationPage />, { wrapper: databaseWrapper(db) })
+
+    await user.click(await screen.findByRole('button', { name: /Nettoyer les fontaines/ }))
+
+    const nameField = screen.getByLabelText('Nom')
+    expect(nameField).toHaveValue('Nettoyer les fontaines')
+    await user.clear(nameField)
+    await user.type(nameField, "Nettoyer les fontaines d'eau")
+    await user.click(screen.getByRole('button', { name: 'Enregistrer' }))
+
+    expect(await screen.findByText("Nettoyer les fontaines d'eau")).toBeInTheDocument()
+    const stored = await db.tasks.get('salon-nettoyer-les-fontaines')
+    expect(stored?.name).toBe("Nettoyer les fontaines d'eau")
+  })
 })

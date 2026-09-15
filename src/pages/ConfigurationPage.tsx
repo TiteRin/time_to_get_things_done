@@ -1,27 +1,32 @@
 import { useState } from 'react'
 import { TaskForm } from '@/components/TaskForm'
 import { TaskList } from '@/components/TaskList'
+import type { Task } from '@/domain/task'
 import { useEquipment } from '@/hooks/useEquipment'
 import { useRooms } from '@/hooks/useRooms'
 import { useTasks } from '@/hooks/useTasks'
 
+type FormState = { open: false } | { open: true; task?: Task }
+
 export function ConfigurationPage() {
-  const { tasks, createTask } = useTasks()
+  const { tasks, createTask, updateTask } = useTasks()
   const { rooms, findOrCreateRoom } = useRooms()
   const { equipment, findOrCreateEquipment } = useEquipment()
-  const [formOpen, setFormOpen] = useState(false)
+  const [form, setForm] = useState<FormState>({ open: false })
 
   return (
     <main className="min-h-dvh bg-slate-900 p-6">
       <h1 className="mb-6 text-xl font-semibold text-slate-100">Configuration</h1>
 
-      {formOpen ? (
+      {form.open ? (
         <TaskForm
+          key={form.task?.id ?? 'new'}
+          task={form.task}
           rooms={rooms ?? []}
           equipment={equipment ?? []}
           onSubmit={(input) => {
-            void createTask(input)
-            setFormOpen(false)
+            void (form.task ? updateTask({ ...input, id: form.task.id }) : createTask(input))
+            setForm({ open: false })
           }}
           onAddRoom={findOrCreateRoom}
           onAddEquipment={findOrCreateEquipment}
@@ -30,12 +35,16 @@ export function ConfigurationPage() {
         <>
           <button
             type="button"
-            onClick={() => setFormOpen(true)}
+            onClick={() => setForm({ open: true })}
             className="mb-6 rounded-xl bg-emerald-500 px-4 py-3 font-medium text-slate-950"
           >
             Ajouter une tâche
           </button>
-          <TaskList tasks={tasks ?? []} rooms={rooms ?? []} />
+          <TaskList
+            tasks={tasks ?? []}
+            rooms={rooms ?? []}
+            onSelect={(task) => setForm({ open: true, task })}
+          />
         </>
       )}
     </main>
