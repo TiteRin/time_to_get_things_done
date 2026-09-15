@@ -11,6 +11,9 @@ async function dragHandle(page: Page, fromTask: string, toTask: string) {
   await page.mouse.down()
   await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 10 })
   await page.mouse.up()
+  // dnd-kit stops propagation of every click for 50ms after a drop (`setTimeout(…, 50)`
+  // in its PointerSensor). A human can't tap that fast, but Playwright can.
+  await page.waitForTimeout(100)
 }
 
 test('builds a list, reorders it, and finds it back on the next visit', async ({ page }) => {
