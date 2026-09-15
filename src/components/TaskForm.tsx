@@ -70,13 +70,8 @@ export function TaskForm({
   const submit = async () => {
     try {
       await onSubmit(
-        normalizeTask({
-          name,
-          expectedDuration,
-          perceivedDifficulty,
-          roomId,
-          equipmentIds: equipmentIds.length > 0 ? equipmentIds : undefined,
-        }),
+        // normalizeTask drops an empty equipment list itself
+        normalizeTask({ name, expectedDuration, perceivedDifficulty, roomId, equipmentIds }),
       )
       setError(undefined)
     } catch (thrown) {
