@@ -56,8 +56,7 @@ test('debriefs a session and corrects a task from it', async ({ page }) => {
   await expect(sheet).toContainText('Durée effective11 min')
 
   await sheet.getByRole('button', { name: 'Modifier la durée prévue' }).click()
-  await expect(sheet.getByRole('spinbutton')).toHaveValue('11')
-  await sheet.getByRole('button', { name: 'Enregistrer' }).click()
+  await sheet.getByRole('button', { name: 'Utiliser 11 min' }).click()
   await expect(sheet.getByRole('button', { name: 'Modifier la durée prévue' })).toHaveText('11 min')
   expect((await storedTask(page, 'Faire la vaisselle'))?.expectedDuration).toBe(11)
 

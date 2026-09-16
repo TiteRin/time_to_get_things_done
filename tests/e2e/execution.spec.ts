@@ -79,6 +79,7 @@ test('ends the session after the last task', async ({ page }) => {
     await page.getByRole('button', { name: 'Tâche suivante' }).click()
   }
 
-  await expect(heading(page, 'Bravo !')).toBeVisible()
+  // Nothing was ever started: the debriefing offers to run the list again
+  await expect(heading(page, 'Aucune tâche effectuée')).toBeVisible()
   await expect(page.getByText('0 tâche effectuée sur 3, temps passé : 0 minute')).toBeVisible()
 })

@@ -71,20 +71,39 @@ export const WithoutExpectedDuration: Story = {
 }
 
 export const EditingExpectedDuration: Story = {
+  render: (args) => <StatefulSheet {...args} />,
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole('button', { name: 'Modifier la durée prévue' }))
 
-    // Prefilled with the effective duration, in minutes
-    const input = canvas.getByRole('spinbutton', { name: 'Durée prévue (minutes)' })
-    await expect(input).toHaveValue(3)
+    // One tap on a preset, or on the duration the task actually took
+    const presets = within(canvas.getByRole('group', { name: 'Durée prévue' }))
+    await expect(presets.getByRole('button', { name: '15 min' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await userEvent.click(presets.getByRole('button', { name: '10 min' }))
 
-    await userEvent.clear(input)
-    await userEvent.type(input, '4')
-    await userEvent.click(canvas.getByRole('button', { name: 'Enregistrer' }))
+    await expect(args.onUpdateTask).toHaveBeenCalledWith({ ...args.task, expectedDuration: 10 })
+    await expect(canvas.queryByRole('group', { name: 'Durée prévue' })).not.toBeInTheDocument()
+    await expect(
+      canvas.getByRole('button', { name: 'Modifier la durée prévue' }),
+    ).toHaveTextContent('10 min')
+  },
+}
 
-    await expect(args.onUpdateTask).toHaveBeenCalledWith({ ...args.task, expectedDuration: 4 })
-    await expect(canvas.queryByRole('spinbutton')).not.toBeInTheDocument()
+/** The measured duration is offered as the first answer */
+export const UsingMeasuredDuration: Story = {
+  render: (args) => <StatefulSheet {...args} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole('button', { name: 'Modifier la durée prévue' }))
+    await userEvent.click(canvas.getByRole('button', { name: 'Utiliser 3 min' }))
+
+    await expect(args.onUpdateTask).toHaveBeenCalledWith({ ...args.task, expectedDuration: 3 })
+    await expect(
+      canvas.getByRole('button', { name: 'Modifier la durée prévue' }),
+    ).toHaveTextContent('3 min')
   },
 }
 

@@ -18,4 +18,14 @@ body {
       transform: translateY(100%);
     }
   }
+
+  /* Editors unfold instead of popping in, which felt abrupt */
+  --animate-reveal: reveal 180ms ease-out;
+
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(-0.5rem);
+    }
+  }
 }

@@ -97,19 +97,17 @@ describe('ExecutionPage', () => {
 
     await user.click(screen.getByRole('button', { name: 'Faire la vaisselle' }))
     await user.click(screen.getByRole('button', { name: 'Modifier la durée prévue' }))
-    const input = screen.getByRole('spinbutton', { name: 'Durée prévue (minutes)' })
-    await user.clear(input)
-    await user.type(input, '12')
-    await user.click(screen.getByRole('button', { name: 'Enregistrer' }))
+    const presets = within(screen.getByRole('group', { name: 'Durée prévue' }))
+    await user.click(presets.getByRole('button', { name: '10 min' }))
 
-    await waitFor(async () => expect((await db.tasks.get(dishes.id))?.expectedDuration).toBe(12))
+    await waitFor(async () => expect((await db.tasks.get(dishes.id))?.expectedDuration).toBe(10))
     // The live query re-renders after the write: wait for the text, not just the button
     await waitFor(() =>
       expect(
         within(screen.getByRole('dialog')).getByRole('button', {
           name: 'Modifier la durée prévue',
         }),
-      ).toHaveTextContent('12 min'),
+      ).toHaveTextContent('10 min'),
     )
 
     await user.click(screen.getByRole('button', { name: 'Fermer le détail' }))

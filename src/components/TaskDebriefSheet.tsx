@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { formatDuration } from '@/domain/debriefing'
 import { difficultyLabels, type Difficulty, type Task } from '@/domain/task'
 import { DifficultyPicker } from './DifficultyPicker'
+import { DurationPicker } from './DurationPicker'
 
 const MINUTE_MS = 60_000
 
@@ -36,17 +37,11 @@ export function TaskDebriefSheet({
   onClose: () => void
 }) {
   const [editing, setEditing] = useState<'duration' | 'difficulty' | null>(null)
-  const [minutes, setMinutes] = useState('')
-  const parsedMinutes = Number(minutes)
-  const validMinutes = Number.isInteger(parsedMinutes) && parsedMinutes > 0
+  // What the task actually took, the most likely answer to "combien de temps ça prend ?"
+  const measuredMinutes = Math.max(1, Math.round(effectiveMs / MINUTE_MS))
 
-  const editDuration = () => {
-    setMinutes(String(Math.max(1, Math.round(effectiveMs / MINUTE_MS))))
-    setEditing('duration')
-  }
-
-  const saveDuration = () => {
-    onUpdateTask({ ...task, expectedDuration: parsedMinutes })
+  const saveDuration = (expectedDuration?: number) => {
+    onUpdateTask({ ...task, expectedDuration })
     setEditing(null)
   }
 
@@ -75,44 +70,16 @@ export function TaskDebriefSheet({
           <Row label="Durée totale">{formatDuration(totalMs)}</Row>
           <Row label="Durée effective">{formatDuration(effectiveMs)}</Row>
           <Row label="Durée prévue">
-            {editing === 'duration' ? (
-              <form
-                className="flex items-center gap-2"
-                onSubmit={(event) => {
-                  event.preventDefault()
-                  if (validMinutes) saveDuration()
-                }}
-              >
-                <input
-                  type="number"
-                  min={1}
-                  step={1}
-                  inputMode="numeric"
-                  aria-label="Durée prévue (minutes)"
-                  value={minutes}
-                  onChange={(event) => setMinutes(event.target.value)}
-                  className="w-20 rounded-lg border border-slate-600 bg-slate-800 px-2 py-1 text-right tabular-nums"
-                />
-                <button
-                  type="submit"
-                  disabled={!validMinutes}
-                  className="rounded-lg bg-emerald-500 px-3 py-1 text-slate-950 disabled:opacity-50"
-                >
-                  Enregistrer
-                </button>
-              </form>
-            ) : (
-              <button
-                type="button"
-                aria-label="Modifier la durée prévue"
-                onClick={editDuration}
-                className={editableClass}
-              >
-                {task.expectedDuration
-                  ? formatDuration(task.expectedDuration * MINUTE_MS)
-                  : 'non renseignée'}
-              </button>
-            )}
+            <button
+              type="button"
+              aria-label="Modifier la durée prévue"
+              onClick={() => setEditing(editing === 'duration' ? null : 'duration')}
+              className={editableClass}
+            >
+              {task.expectedDuration
+                ? formatDuration(task.expectedDuration * MINUTE_MS)
+                : 'non renseignée'}
+            </button>
           </Row>
           <Row label="Difficulté">
             <button
@@ -128,8 +95,21 @@ export function TaskDebriefSheet({
           </Row>
         </dl>
 
+        {editing === 'duration' && (
+          <div className="animate-reveal mt-4 flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={() => saveDuration(measuredMinutes)}
+              className="self-start rounded-full bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950 active:bg-emerald-400"
+            >
+              Utiliser {formatDuration(measuredMinutes * MINUTE_MS)}
+            </button>
+            <DurationPicker value={task.expectedDuration} onChange={saveDuration} />
+          </div>
+        )}
+
         {editing === 'difficulty' && (
-          <div className="mt-4 flex flex-col gap-4">
+          <div className="animate-reveal mt-4 flex flex-col gap-4">
             <div>
               <p className="mb-2 text-sm text-slate-400">Comment l'avez-vous vécue cette fois ?</p>
               <DifficultyPicker
