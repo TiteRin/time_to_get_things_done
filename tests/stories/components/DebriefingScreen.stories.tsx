@@ -48,10 +48,20 @@ export const Completed: Story = {
     await expect(canvas.getByRole('heading', { name: 'Bravo !' })).toBeInTheDocument()
     await expect(canvas.queryByRole('button', { name: 'Relancer' })).toBeNull()
 
+    // One block per task: the mid-task pause is hatched inside it, not split out
     const timeline = timelineOf(canvasElement)
-    await expect(timeline.getAllByRole('button', { name: 'Faire la vaisselle' })).toHaveLength(2)
+    await expect(timeline.getAllByRole('button', { name: 'Faire la vaisselle' })).toHaveLength(1)
     await expect(timeline.getByText('Pause')).toBeInTheDocument()
     await expect(timeline.getByText('Attente')).toBeInTheDocument()
+
+    // Axis in delays since the start, the 10 min 30 s tick dropped as it overlaps 10 min
+    const axis = within(canvas.getByRole('list', { name: 'Axe des temps' }))
+    await expect(axis.getByText('T0')).toBeInTheDocument()
+    await expect(axis.getByText('+4 min')).toBeInTheDocument()
+    await expect(axis.getByText('+6 min')).toBeInTheDocument()
+    await expect(axis.getByText('+10 min')).toBeInTheDocument()
+    await expect(axis.queryByText('+11 min')).toBeNull()
+    await expect(axis.getByText('+20 min')).toBeInTheDocument()
 
     await expect(
       canvas.getByText('3 tâches effectuées sur 3, temps passé : 20 minutes'),

@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import {
+  formatOffset,
   sessionSummary,
   taskDurations,
-  timelineSegments,
-  type TimelineSegment,
+  timelineBlocks,
+  type TimelineBlock,
 } from '@/domain/debriefing'
 import type { TimelineEntry } from '@/domain/session'
 import type { Difficulty, Task } from '@/domain/task'
@@ -11,54 +12,123 @@ import { TaskDebriefSheet } from './TaskDebriefSheet'
 
 const MINUTE_MS = 60_000
 const PX_PER_MINUTE = 16
-// Short segments stay readable (work) and visible (pauses) despite the scale
-const MIN_WORK_PX = 44
-const MIN_PAUSE_PX = 12
+const GAP_PX = 4
+// Short blocks stay readable (tasks) and visible (waits) despite the scale
+const MIN_TASK_PX = 44
+const MIN_WAIT_PX = 12
+// Two labels any closer would overlap: only the first one is kept
+const MIN_LABEL_GAP_PX = 18
+
+const HATCHED =
+  'bg-[repeating-linear-gradient(45deg,var(--color-slate-700)_0_6px,transparent_6px_12px)]'
 
 const plural = (count: number, singular: string, pluralForm: string) =>
   count >= 2 ? pluralForm : singular
 
-const clockTime = (ms: number) =>
-  new Date(ms).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+type PlacedBlock = { block: TimelineBlock; top: number; height: number }
+type Tick = { at: number; y: number }
 
-function TimelineBlock({
-  segment,
-  origin,
-  task,
-  onSelect,
-}: {
-  segment: TimelineSegment
-  origin: number
-  task?: Task
-  onSelect: () => void
-}) {
-  const minutes = (segment.to - segment.from) / MINUTE_MS
+/** Stacks the blocks top to bottom, each one tall enough to stay legible */
+function placeBlocks(blocks: TimelineBlock[]): PlacedBlock[] {
+  let top = 0
 
-  if (segment.kind !== 'work') {
-    return (
-      <li
-        style={{ height: Math.max(minutes * PX_PER_MINUTE, MIN_PAUSE_PX) }}
-        className="ml-14 flex items-center rounded-md bg-[repeating-linear-gradient(45deg,var(--color-slate-700)_0_6px,transparent_6px_12px)] px-3 text-xs text-slate-400"
-      >
-        <span className="sr-only">{segment.kind === 'pause' ? 'Pause' : 'Attente'}</span>
-      </li>
-    )
+  return blocks.map((block) => {
+    const minutes = (block.to - block.from) / MINUTE_MS
+    const floor = block.kind === 'task' ? MIN_TASK_PX : MIN_WAIT_PX
+    const placed = { block, top, height: Math.max(minutes * PX_PER_MINUTE, floor) }
+    top = placed.top + placed.height + GAP_PX
+    return placed
+  })
+}
+
+/** Start and end of every block and pause, minus the labels that would overlap */
+function axisTicks(placed: PlacedBlock[]): Tick[] {
+  const ticks: Tick[] = []
+
+  for (const { block, top, height } of placed) {
+    const y = (at: number) => top + ((at - block.from) / (block.to - block.from)) * height
+    ticks.push({ at: block.from, y: top })
+    for (const pause of block.pauses) {
+      ticks.push({ at: pause.from, y: y(pause.from) }, { at: pause.to, y: y(pause.to) })
+    }
   }
 
+  const last = placed.at(-1)
+  if (last) ticks.push({ at: last.block.to, y: last.top + last.height })
+
+  return ticks
+    .sort((a, b) => a.y - b.y)
+    .reduce<Tick[]>((kept, tick) => {
+      const previous = kept.at(-1)
+      if (!previous || tick.y - previous.y >= MIN_LABEL_GAP_PX) kept.push(tick)
+      return kept
+    }, [])
+}
+
+function Timeline({
+  placed,
+  tasks,
+  onSelect,
+}: {
+  placed: PlacedBlock[]
+  tasks: Task[]
+  onSelect: (taskIndex: number) => void
+}) {
+  const last = placed.at(-1)!
+  const height = last.top + last.height
+
   return (
-    <li className="flex gap-2">
-      <span className="w-12 shrink-0 pt-1 text-right text-xs text-slate-500 tabular-nums">
-        {clockTime(origin + segment.from)}
-      </span>
-      <button
-        type="button"
-        onClick={onSelect}
-        style={{ height: Math.max(minutes * PX_PER_MINUTE, MIN_WORK_PX) }}
-        className="flex flex-1 items-start rounded-md border-l-4 border-emerald-400 bg-emerald-950 px-3 py-2 text-left font-medium active:bg-emerald-900"
-      >
-        {task?.name}
-      </button>
-    </li>
+    <div className="relative" style={{ height }}>
+      <ol aria-label="Axe des temps" className="absolute inset-y-0 left-0 w-12">
+        {axisTicks(placed).map((tick) => (
+          <li
+            key={tick.at}
+            style={{ top: tick.y }}
+            className="absolute right-0 -translate-y-1/2 text-xs text-slate-500 tabular-nums"
+          >
+            {formatOffset(tick.at)}
+          </li>
+        ))}
+      </ol>
+
+      <ol aria-label="Timeline" className="absolute inset-y-0 right-0 left-14">
+        {placed.map(({ block, top, height }) =>
+          block.kind === 'wait' ? (
+            <li
+              key={block.from}
+              style={{ top, height }}
+              className={`absolute inset-x-0 rounded-md ${HATCHED}`}
+            >
+              <span className="sr-only">Attente</span>
+            </li>
+          ) : (
+            <li key={block.from} style={{ top, height }} className="absolute inset-x-0">
+              <button
+                type="button"
+                // Explicit: the hatched pauses inside must not end up in the name
+                aria-label={tasks[block.taskIndex]?.name}
+                onClick={() => onSelect(block.taskIndex)}
+                className="relative flex size-full items-start overflow-hidden rounded-md border-l-4 border-emerald-400 bg-emerald-950 px-3 py-2 text-left font-medium active:bg-emerald-900"
+              >
+                {tasks[block.taskIndex]?.name}
+                {block.pauses.map((pause) => (
+                  <span
+                    key={pause.from}
+                    style={{
+                      top: `${((pause.from - block.from) / (block.to - block.from)) * 100}%`,
+                      height: `${((pause.to - pause.from) / (block.to - block.from)) * 100}%`,
+                    }}
+                    className={`absolute inset-x-0 ${HATCHED}`}
+                  >
+                    <span className="sr-only">Pause</span>
+                  </span>
+                ))}
+              </button>
+            </li>
+          ),
+        )}
+      </ol>
+    </div>
   )
 }
 
@@ -82,8 +152,7 @@ export function DebriefingScreen({
     Record<number, Difficulty | undefined>
   >({})
 
-  const segments = timelineSegments(timeline)
-  const origin = timeline[0]?.at ?? 0
+  const placed = placeBlocks(timelineBlocks(timeline))
   const { completedCount, taskCount, elapsedMs } = sessionSummary(timeline, tasks.length)
   const elapsedMinutes = Math.round(elapsedMs / MINUTE_MS)
   const selectedTask = selected === null ? undefined : tasks[selected]
@@ -99,20 +168,10 @@ export function DebriefingScreen({
         <h1 className="mb-6 text-3xl font-bold">Bravo !</h1>
       )}
 
-      {segments.length === 0 ? (
+      {placed.length === 0 ? (
         <p className="text-slate-400">Aucune tâche démarrée.</p>
       ) : (
-        <ol aria-label="Timeline" className="flex flex-col gap-1">
-          {segments.map((segment) => (
-            <TimelineBlock
-              key={segment.from}
-              segment={segment}
-              origin={origin}
-              task={tasks[segment.taskIndex]}
-              onSelect={() => setSelected(segment.taskIndex)}
-            />
-          ))}
-        </ol>
+        <Timeline placed={placed} tasks={tasks} onSelect={setSelected} />
       )}
 
       <footer className="mt-auto flex flex-col gap-4 pt-8 text-center">
