@@ -110,6 +110,31 @@ describe('ExecutionPage', () => {
     expect(await screen.findByRole('heading', { name: 'Écran de génération' })).toBeInTheDocument()
   })
 
+  it('shows the perceived difficulty as selected once corrected', async () => {
+    const user = userEvent.setup()
+    const db = openDatabase()
+    const stored = await taskRepository.listTasks(db)
+    const dishes = stored.find((task) => task.name === 'Faire la vaisselle')!
+    saveLastList([dishes.id])
+
+    render(<ExecutionPage />, { wrapper: routedWrapper(db) })
+
+    await user.click(await screen.findByRole('button', { name: 'Démarrer' }))
+    await user.click(screen.getByRole('button', { name: 'Tâche suivante' }))
+    await user.click(await screen.findByRole('button', { name: 'Faire la vaisselle' }))
+    await user.click(screen.getByRole('button', { name: 'Renseigner la difficulté' }))
+
+    const perceived = within(screen.getByRole('group', { name: 'Difficulté perçue' }))
+    await user.click(perceived.getByRole('button', { name: 'Difficile' }))
+
+    await waitFor(() =>
+      expect(perceived.getByRole('button', { name: 'Difficile' })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      ),
+    )
+  })
+
   it('goes back to the generation screen without a saved list', async () => {
     render(<ExecutionPage />, { wrapper: routedWrapper(openDatabase()) })
 

@@ -1,6 +1,31 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { useState, type ComponentProps } from 'react'
 import { expect, fn, userEvent, within } from 'storybook/test'
 import { TaskDebriefSheet } from '@/components/TaskDebriefSheet'
+
+type SheetProps = ComponentProps<typeof TaskDebriefSheet>
+
+/** Holds the edits in state, like the screen does through the database */
+function StatefulSheet({ task: initialTask, ...args }: SheetProps) {
+  const [task, setTask] = useState(initialTask)
+  const [actualDifficulty, setActualDifficulty] = useState(args.actualDifficulty)
+
+  return (
+    <TaskDebriefSheet
+      {...args}
+      task={task}
+      actualDifficulty={actualDifficulty}
+      onActualDifficultyChange={(value) => {
+        args.onActualDifficultyChange(value)
+        setActualDifficulty(value)
+      }}
+      onUpdateTask={(updated) => {
+        args.onUpdateTask(updated)
+        setTask(updated)
+      }}
+    />
+  )
+}
 
 const meta = {
   title: 'Débriefing/TaskDebriefSheet',
@@ -65,6 +90,7 @@ export const EditingExpectedDuration: Story = {
 
 export const EditingDifficulty: Story = {
   args: { actualDifficulty: 'easy' },
+  render: (args) => <StatefulSheet {...args} />,
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole('button', { name: 'Renseigner la difficulté' }))
@@ -76,6 +102,10 @@ export const EditingDifficulty: Story = {
     )
     await userEvent.click(actual.getByRole('button', { name: 'Difficile' }))
     await expect(args.onActualDifficultyChange).toHaveBeenCalledWith('hard')
+    await expect(actual.getByRole('button', { name: 'Difficile' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
 
     const perceived = within(canvas.getByRole('group', { name: 'Difficulté perçue' }))
     await userEvent.click(perceived.getByRole('button', { name: 'Difficile' }))
@@ -83,5 +113,9 @@ export const EditingDifficulty: Story = {
       ...args.task,
       perceivedDifficulty: 'hard',
     })
+    await expect(perceived.getByRole('button', { name: 'Difficile' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
   },
 }
