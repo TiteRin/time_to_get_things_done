@@ -67,11 +67,13 @@ export function DebriefingScreen({
   tasks,
   timeline,
   onUpdateTask,
+  onRestart,
   onClose,
 }: {
   tasks: Task[]
   timeline: TimelineEntry[]
   onUpdateTask: (task: Task) => void
+  onRestart: () => void
   onClose: () => void
 }) {
   const [selected, setSelected] = useState<number | null>(null)
@@ -88,10 +90,14 @@ export function DebriefingScreen({
 
   return (
     <main className="flex min-h-dvh flex-col bg-slate-900 px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))] text-slate-50">
-      <h1 className="text-3xl font-bold">Bravo !</h1>
-      <p className="mt-2 mb-6 text-slate-300">
-        La session est terminée. Chaque tâche lancée est une victoire.
-      </p>
+      {completedCount === 0 ? (
+        <>
+          <h1 className="text-3xl font-bold">Aucune tâche effectuée</h1>
+          <p className="mt-2 mb-6 text-slate-300">Voulez-vous relancer depuis le début ?</p>
+        </>
+      ) : (
+        <h1 className="mb-6 text-3xl font-bold">Bravo !</h1>
+      )}
 
       {segments.length === 0 ? (
         <p className="text-slate-400">Aucune tâche démarrée.</p>
@@ -114,10 +120,23 @@ export function DebriefingScreen({
           {completedCount} {plural(completedCount, 'tâche effectuée', 'tâches effectuées')} sur{' '}
           {taskCount}, temps passé : {elapsedMinutes} {plural(elapsedMinutes, 'minute', 'minutes')}
         </p>
+        {completedCount === 0 && (
+          <button
+            type="button"
+            onClick={onRestart}
+            className="rounded-2xl bg-emerald-500 px-6 py-4 text-xl font-semibold text-slate-950 active:bg-emerald-400"
+          >
+            Relancer
+          </button>
+        )}
         <button
           type="button"
           onClick={onClose}
-          className="rounded-2xl bg-emerald-500 px-6 py-4 text-xl font-semibold text-slate-950 active:bg-emerald-400"
+          className={
+            completedCount === 0
+              ? 'rounded-2xl border border-slate-600 px-6 py-4 text-xl font-semibold active:bg-slate-800'
+              : 'rounded-2xl bg-emerald-500 px-6 py-4 text-xl font-semibold text-slate-950 active:bg-emerald-400'
+          }
         >
           Fermer
         </button>

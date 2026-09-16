@@ -20,7 +20,7 @@ const tasks: Task[] = [
 const meta = {
   title: 'Débriefing/DebriefingScreen',
   component: DebriefingScreen,
-  args: { tasks, timeline: [], onUpdateTask: fn(), onClose: fn() },
+  args: { tasks, timeline: [], onUpdateTask: fn(), onRestart: fn(), onClose: fn() },
 } satisfies Meta<typeof DebriefingScreen>
 
 export default meta
@@ -46,6 +46,7 @@ export const Completed: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole('heading', { name: 'Bravo !' })).toBeInTheDocument()
+    await expect(canvas.queryByRole('button', { name: 'Relancer' })).toBeNull()
 
     const timeline = timelineOf(canvasElement)
     await expect(timeline.getAllByRole('button', { name: 'Faire la vaisselle' })).toHaveLength(2)
@@ -104,12 +105,20 @@ export const NoTaskStarted: Story = {
   args: {
     timeline: [at('complete', 0, 0), at('complete', 1, 20), at('complete', 2, 40)],
   },
-  play: async ({ canvasElement }) => {
-    const timeline = timelineOf(canvasElement)
-    await expect(timeline.queryAllByRole('button')).toHaveLength(0)
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await expect(timelineOf(canvasElement).queryAllByRole('button')).toHaveLength(0)
+    await expect(canvas.queryByRole('heading', { name: 'Bravo !' })).toBeNull()
     await expect(
-      within(canvasElement).getByText('0 tâche effectuée sur 3, temps passé : 1 minute'),
+      canvas.getByRole('heading', { name: 'Aucune tâche effectuée' }),
     ).toBeInTheDocument()
+    await expect(canvas.getByText('Voulez-vous relancer depuis le début ?')).toBeInTheDocument()
+    await expect(
+      canvas.getByText('0 tâche effectuée sur 3, temps passé : 1 minute'),
+    ).toBeInTheDocument()
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Relancer' }))
+    await expect(args.onRestart).toHaveBeenCalled()
   },
 }
 
@@ -119,6 +128,7 @@ export const Empty: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByText('Aucune tâche démarrée.')).toBeInTheDocument()
+    await expect(canvas.getByRole('heading', { name: 'Aucune tâche effectuée' })).toBeInTheDocument()
     await expect(
       canvas.getByText('0 tâche effectuée sur 3, temps passé : 0 minute'),
     ).toBeInTheDocument()

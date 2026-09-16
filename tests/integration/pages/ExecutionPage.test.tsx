@@ -51,14 +51,21 @@ describe('ExecutionPage', () => {
     expect(await screen.findByRole('heading', { name: 'Bravo !' })).toBeInTheDocument()
   })
 
-  it('ends the session early from the top menu', async () => {
+  it('ends the session early from the top menu, then restarts it', async () => {
     const user = userEvent.setup()
     render(<ExecutionPage tasks={tasks} />, { wrapper: routedWrapper() })
 
     await user.click(screen.getByRole('button', { name: 'Afficher le menu' }))
     await user.click(screen.getByRole('button', { name: 'Terminer' }))
 
-    expect(await screen.findByRole('heading', { name: 'Bravo !' })).toBeInTheDocument()
+    // Nothing was done: the debriefing offers to run the list again
+    expect(
+      await screen.findByRole('heading', { name: 'Aucune tâche effectuée' }),
+    ).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Relancer' }))
+
+    expect(screen.getByRole('heading', { name: 'Faire la vaisselle' })).toBeInTheDocument()
+    expect(screen.getByText('1 / 2')).toBeInTheDocument()
   })
 
   it('runs the last saved list, in its saved order', async () => {

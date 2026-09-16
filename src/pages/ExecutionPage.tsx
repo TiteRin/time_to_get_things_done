@@ -28,10 +28,11 @@ function LastListSession() {
 }
 
 function ExecutionSession({ tasks }: { tasks: Task[] }) {
-  const { state, currentTask, toggle, next, openMenu, closeMenu, finish } = useSession(tasks)
+  const { state, currentTask, toggle, next, openMenu, closeMenu, finish, restart } =
+    useSession(tasks)
 
   if (state.status === 'ended' || !currentTask) {
-    return <SessionDebriefing tasks={state.tasks} timeline={state.timeline} />
+    return <SessionDebriefing tasks={state.tasks} timeline={state.timeline} onRestart={restart} />
   }
 
   return (
@@ -56,7 +57,15 @@ function ExecutionSession({ tasks }: { tasks: Task[] }) {
 }
 
 /** Shows the stored version of each task, so edits made from the debriefing show up at once */
-function SessionDebriefing({ tasks, timeline }: { tasks: Task[]; timeline: TimelineEntry[] }) {
+function SessionDebriefing({
+  tasks,
+  timeline,
+  onRestart,
+}: {
+  tasks: Task[]
+  timeline: TimelineEntry[]
+  onRestart: () => void
+}) {
   const { tasks: stored, updateTask } = useTasks()
   const navigate = useNavigate()
 
@@ -68,6 +77,7 @@ function SessionDebriefing({ tasks, timeline }: { tasks: Task[]; timeline: Timel
       tasks={tasks.map((task) => byId.get(task.id) ?? task)}
       timeline={timeline}
       onUpdateTask={(task) => void updateTask(task)}
+      onRestart={onRestart}
       onClose={() => navigate('/')}
     />
   )
