@@ -1,5 +1,8 @@
 import { actualDurationMs, type TimelineEntry } from './session'
 
+const MINUTE_MS = 60_000
+const HOUR_MS = 3_600_000
+
 /**
  * A stretch of the session. `pause` is a task paused mid-way; `wait` is the time a task
  * spends waiting for its first tap (or to be skipped). Both are excluded from effective time.
@@ -32,6 +35,58 @@ export function timelineSegments(timeline: TimelineEntry[]): TimelineSegment[] {
   }
 
   return segments
+}
+
+export type TimelineInterval = { from: number; to: number }
+
+/**
+ * One agenda block: a task with its mid-task pauses (hatched inside it), or the wait
+ * before a task got its first tap. Times are milliseconds since the first event.
+ */
+export type TimelineBlock = TimelineInterval & {
+  taskIndex: number
+  kind: 'task' | 'wait'
+  pauses: TimelineInterval[]
+}
+
+/** Groups the segments of a task into a single block, waits staying on their own */
+export function timelineBlocks(timeline: TimelineEntry[]): TimelineBlock[] {
+  const blocks: TimelineBlock[] = []
+
+  for (const segment of timelineSegments(timeline)) {
+    const last = blocks.at(-1)
+    const continuesTask =
+      segment.kind !== 'wait' &&
+      last?.kind === 'task' &&
+      last.taskIndex === segment.taskIndex &&
+      last.to === segment.from
+
+    if (continuesTask) {
+      last.to = segment.to
+    } else {
+      blocks.push({
+        kind: segment.kind === 'wait' ? 'wait' : 'task',
+        taskIndex: segment.taskIndex,
+        from: segment.from,
+        to: segment.to,
+        pauses: [],
+      })
+    }
+
+    if (segment.kind === 'pause') {
+      blocks.at(-1)!.pauses.push({ from: segment.from, to: segment.to })
+    }
+  }
+
+  return blocks
+}
+
+/** Axis label: a delay since the beginning of the session, never a clock time */
+export function formatOffset(ms: number): string {
+  if (ms === 0) return 'T0'
+  if (ms < MINUTE_MS) return `+${Math.round(ms / 1000)} s`
+  if (ms < HOUR_MS) return `+${Math.round(ms / MINUTE_MS)} min`
+  return `+${formatDuration(ms)}`
 }
 
 /** Total (pauses included) and effective (running only) time of one task; waits never count */
