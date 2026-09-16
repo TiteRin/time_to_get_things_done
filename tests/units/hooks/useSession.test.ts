@@ -72,4 +72,16 @@ describe('useSession', () => {
     expect(hook.result.current.state.status).toBe('ended')
     expect(hook.result.current.state.timeline).toEqual([{ type: 'finish', taskIndex: 0, at: 4000 }])
   })
+
+  it('restart wipes an ended session and waits on the first task again', () => {
+    const { clock, hook } = setup()
+
+    clock.set(4000)
+    act(() => hook.result.current.finish())
+    act(() => hook.result.current.restart())
+
+    expect(hook.result.current.state.status).toBe('idle')
+    expect(hook.result.current.currentTask).toEqual(tasks[0])
+    expect(hook.result.current.state.timeline).toEqual([])
+  })
 })

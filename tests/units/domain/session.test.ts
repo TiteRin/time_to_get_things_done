@@ -155,6 +155,16 @@ describe('sessionReducer', () => {
       expect(sessionReducer(ended, event)).toBe(ended)
     }
   })
+
+  it('restarts an ended session from the top, with the same tasks', () => {
+    const ended = run([
+      { type: 'START', at: 1000 },
+      { type: 'NEXT', at: 2000 },
+      { type: 'NEXT', at: 3000 },
+    ])
+
+    expect(sessionReducer(ended, { type: 'RESTART' })).toEqual(createSession(tasks))
+  })
 })
 
 describe('actualDurationMs', () => {
