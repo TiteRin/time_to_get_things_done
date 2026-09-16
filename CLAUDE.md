@@ -62,8 +62,10 @@ Tests never live next to source. They sit under `tests/<kind>/` and mirror the p
 
 ## Débriefing semantics (decided)
 
-- Pauses and waits (a task waiting for its first tap) are both hatched in the timeline and excluded from effective time; only started tasks have clickable blocks.
-- Editing the expected duration is prefilled with the effective duration and saved with `updateTask`; the perceived difficulty is saved too. The **actual** difficulty felt is kept in screen state only, until a session history exists.
+- The timeline is one block per task (`timelineBlocks`), mid-task pauses hatched **inside** it; the wait before a task's first tap stays a separate hatched block. Both are excluded from effective time, and only started tasks have clickable blocks.
+- The vertical axis shows delays since the first event (`formatOffset`, `T0` / `+4 min`), at the start and end of every block and pause; a label closer than 18 px to the previous one is dropped.
+- Editing the expected duration is one tap: the measured duration is offered first, then the `DurationPicker` presets; it is saved with `updateTask`, and so is the perceived difficulty. The **actual** difficulty felt is kept in screen state only, until a session history exists.
+- A session where nothing was completed shows "Aucune tâche effectuée" and a **Relancer** button (`RESTART` rebuilds the session from the same tasks) instead of the congratulations.
 - `ExecutionPage` feeds the debriefing with the stored version of each session task (live query) so edits show up at once.
 
 ## Project overview
