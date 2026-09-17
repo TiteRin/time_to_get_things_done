@@ -21,6 +21,9 @@ const STATUS_HINT = {
   paused: 'En pause',
 } as const
 
+const FINISH_CLASS =
+  'rounded-2xl bg-accent py-4 text-lg font-semibold text-accent-foreground pb-[max(1rem,env(safe-area-inset-bottom))]'
+
 /** Unlike the Exécution screen, the chrono is a deliberate, visible timer */
 export function ChronoScreen({
   task,
@@ -78,14 +81,16 @@ export function ChronoScreen({
         </p>
       </div>
 
-      {started && (
-        <button
-          type="button"
-          onClick={onFinish}
-          className="rounded-2xl bg-accent py-4 text-lg font-semibold text-accent-foreground pb-[max(1rem,env(safe-area-inset-bottom))]"
-        >
+      {/* Reserves the row's space even when hidden, so it doesn't shift the centered
+          content above once Terminer appears */}
+      {started ? (
+        <button type="button" onClick={onFinish} className={FINISH_CLASS}>
           Terminer
         </button>
+      ) : (
+        <div aria-hidden="true" className={`invisible ${FINISH_CLASS}`}>
+          Terminer
+        </div>
       )}
 
       {confirmingCancel && (
