@@ -15,7 +15,7 @@ const meta = {
   args: { equipment, value: [], onChange: fn(), onAddEquipment: fn() },
   decorators: [
     (Story) => (
-      <div className="min-h-dvh bg-slate-900 p-6">
+      <div className="min-h-dvh bg-background p-6">
         <Story />
       </div>
     ),

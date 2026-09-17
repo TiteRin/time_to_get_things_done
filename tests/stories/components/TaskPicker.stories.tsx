@@ -22,7 +22,7 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   args: {
     footerExtra: (
-      <a href="/" className="font-medium text-emerald-400">
+      <a href="/" className="font-medium text-accent-secondary">
         Annuler
       </a>
     ),

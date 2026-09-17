@@ -26,7 +26,7 @@ export function ChronoPage() {
         rooms={rooms}
         onSelect={setPickedId}
         footerExtra={
-          <Link to="/" className="font-medium text-emerald-400">
+          <Link to="/" className="font-medium text-accent-secondary">
             Annuler
           </Link>
         }

@@ -9,7 +9,7 @@ export function HomePage() {
       onGenerate={() => navigate('/generation')}
       onChrono={() => navigate('/chrono')}
       footerExtra={
-        <Link to="/configuration" className="font-medium text-emerald-400">
+        <Link to="/configuration" className="font-medium text-accent-secondary">
           Configuration
         </Link>
       }

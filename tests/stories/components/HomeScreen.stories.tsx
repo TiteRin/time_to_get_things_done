@@ -14,7 +14,7 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   args: {
     footerExtra: (
-      <a href="/configuration" className="font-medium text-emerald-400">
+      <a href="/configuration" className="font-medium text-accent-secondary">
         Configuration
       </a>
     ),

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export function HomeScreen({
   onGenerate,
@@ -11,20 +12,21 @@ export function HomeScreen({
   footerExtra?: ReactNode
 }) {
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-10 bg-slate-900 p-6 text-center">
-      <h1 className="text-2xl font-bold text-slate-100">Time To Get Things Done</h1>
+    <main className="relative flex min-h-dvh flex-col items-center justify-center gap-10 bg-background p-6 text-center">
+      <ThemeToggle className="absolute top-[max(1rem,env(safe-area-inset-top))] right-4" />
+      <h1 className="text-2xl font-bold text-foreground">Time To Get Things Done</h1>
       <div className="flex w-full max-w-sm flex-col gap-4">
         <button
           type="button"
           onClick={onGenerate}
-          className="rounded-xl bg-emerald-500 py-4 text-lg font-medium text-slate-950"
+          className="rounded-xl bg-accent py-4 text-lg font-medium text-accent-foreground"
         >
           Générer une liste
         </button>
         <button
           type="button"
           onClick={onChrono}
-          className="rounded-xl border border-slate-600 py-4 text-lg font-medium text-slate-100"
+          className="rounded-xl border border-border py-4 text-lg font-medium text-foreground"
         >
           Chronométrer une tâche
         </button>
