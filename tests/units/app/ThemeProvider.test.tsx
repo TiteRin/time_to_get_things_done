@@ -11,8 +11,10 @@ function createMatchMedia(initialMatches: boolean) {
     get matches() {
       return matches
     },
-    addEventListener: (_type: string, cb: (event: { matches: boolean }) => void) => listeners.add(cb),
-    removeEventListener: (_type: string, cb: (event: { matches: boolean }) => void) => listeners.delete(cb),
+    addEventListener: (_type: string, cb: (event: { matches: boolean }) => void) =>
+      listeners.add(cb),
+    removeEventListener: (_type: string, cb: (event: { matches: boolean }) => void) =>
+      listeners.delete(cb),
   }
   return {
     mql,
@@ -24,10 +26,7 @@ function createMatchMedia(initialMatches: boolean) {
 }
 
 function stubMatchMedia(mql: unknown) {
-  vi.stubGlobal(
-    'matchMedia',
-    vi.fn().mockReturnValue(mql),
-  )
+  vi.stubGlobal('matchMedia', vi.fn().mockReturnValue(mql))
 }
 
 function Probe() {
@@ -35,7 +34,9 @@ function Probe() {
   return (
     <div>
       <span data-testid="theme">{resolvedTheme}</span>
-      <button onClick={() => setOverride(resolvedTheme === 'dark' ? 'light' : 'dark')}>toggle</button>
+      <button onClick={() => setOverride(resolvedTheme === 'dark' ? 'light' : 'dark')}>
+        toggle
+      </button>
     </div>
   )
 }

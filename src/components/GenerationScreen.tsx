@@ -161,7 +161,10 @@ function SelectionList({
                     >
                       {task.name}
                     </span>
-                    <span id={`task-details-${task.id}`} className="block text-sm text-muted-foreground">
+                    <span
+                      id={`task-details-${task.id}`}
+                      className="block text-sm text-muted-foreground"
+                    >
                       {details(task)}
                     </span>
                   </span>
