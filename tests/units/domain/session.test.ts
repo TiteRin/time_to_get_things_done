@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 import {
   actualDurationMs,
   createSession,
+  elapsedMs,
   sessionReducer,
+  totalDurationMs,
   type SessionEvent,
 } from '@/domain/session'
 import type { Task } from '@/domain/task'
@@ -185,5 +187,60 @@ describe('actualDurationMs', () => {
     ])
 
     expect(actualDurationMs(session.timeline, 0)).toBe(1000)
+  })
+})
+
+describe('totalDurationMs', () => {
+  it('is 0 for a task that was never started', () => {
+    const session = run([{ type: 'NEXT', at: 5000 }])
+    expect(totalDurationMs(session.timeline, 0)).toBe(0)
+  })
+
+  it('spans from the first start to the last event, pauses included', () => {
+    const session = run([
+      { type: 'START', at: 1000 },
+      { type: 'PAUSE', at: 3000 },
+      { type: 'RESUME', at: 10_000 },
+      { type: 'NEXT', at: 15_000 },
+    ])
+
+    expect(totalDurationMs(session.timeline, 0)).toBe(14_000)
+  })
+})
+
+describe('elapsedMs', () => {
+  it('is 0 for a task that was never started', () => {
+    const session = run([])
+    expect(elapsedMs(session.timeline, 0, 5000)).toBe(0)
+  })
+
+  it('matches actualDurationMs once every segment is closed', () => {
+    const session = run([
+      { type: 'START', at: 1000 },
+      { type: 'PAUSE', at: 3000 },
+      { type: 'RESUME', at: 10_000 },
+      { type: 'NEXT', at: 15_000 },
+    ])
+
+    expect(elapsedMs(session.timeline, 0, 999_999)).toBe(actualDurationMs(session.timeline, 0))
+  })
+
+  it('adds the currently running open segment up to now', () => {
+    const session = run([
+      { type: 'START', at: 1000 },
+      { type: 'PAUSE', at: 3000 }, // 2s
+      { type: 'RESUME', at: 10_000 },
+    ])
+
+    expect(elapsedMs(session.timeline, 0, 12_000)).toBe(4000)
+  })
+
+  it('freezes while paused', () => {
+    const session = run([
+      { type: 'START', at: 1000 },
+      { type: 'PAUSE', at: 3000 },
+    ])
+
+    expect(elapsedMs(session.timeline, 0, 50_000)).toBe(2000)
   })
 })

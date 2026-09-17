@@ -21,7 +21,7 @@ function LastListSession() {
 
   const byId = new Map(tasks.map((task) => [task.id, task]))
   const list = ids.flatMap((id) => byId.get(id) ?? [])
-  if (list.length === 0) return <Navigate to="/" replace />
+  if (list.length === 0) return <Navigate to="/generation" replace />
 
   return <ExecutionSession tasks={list} />
 }
@@ -36,7 +36,7 @@ function ExecutionSession({ tasks }: { tasks: Task[] }) {
         timeline={state.timeline}
         footer={
           <div className="flex flex-col gap-2">
-            <Link to="/" className="font-medium text-accent-secondary">
+            <Link to="/generation" className="font-medium text-accent-secondary">
               Nouvelle liste
             </Link>
             <Link to="/configuration" className="font-medium text-accent-secondary">

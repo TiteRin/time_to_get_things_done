@@ -13,7 +13,7 @@ const meta = {
   args: { rooms, onSelect: fn() },
   decorators: [
     (Story) => (
-      <div className="min-h-dvh bg-slate-900 p-6">
+      <div className="min-h-dvh bg-background p-6">
         <Story />
       </div>
     ),

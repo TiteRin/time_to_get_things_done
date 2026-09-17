@@ -54,7 +54,10 @@ export function ConfigurationPage() {
             rooms={rooms}
             onSelect={(task) => setForm({ open: true, task })}
           />
-          <Link to="/" className="mt-6 block text-center font-medium text-accent-secondary">
+          <Link
+            to="/generation"
+            className="mt-6 block text-center font-medium text-accent-secondary"
+          >
             Créer une liste
           </Link>
         </>
