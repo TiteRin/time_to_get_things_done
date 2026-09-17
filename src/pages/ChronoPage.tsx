@@ -66,9 +66,10 @@ function ChronoSession({
     toggle()
   }
 
+  // Ticks fast enough to keep the mm:ss:cc hundredths moving visibly
   useEffect(() => {
     if (state.status !== 'running') return
-    const id = setInterval(() => setNow(Date.now()), 1000)
+    const id = setInterval(() => setNow(Date.now()), 30)
     return () => clearInterval(id)
   }, [state.status])
 

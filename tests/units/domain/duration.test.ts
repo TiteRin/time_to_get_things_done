@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatElapsedTime, minutesFromMs } from '@/domain/duration'
+import { formatChronoTime, formatElapsedTime, minutesFromMs } from '@/domain/duration'
 
 describe('minutesFromMs', () => {
   it('is 0 when nothing was timed', () => {
@@ -21,5 +21,13 @@ describe('formatElapsedTime', () => {
     expect(formatElapsedTime(0)).toBe('00:00')
     expect(formatElapsedTime(65_000)).toBe('01:05')
     expect(formatElapsedTime(3_723_000)).toBe('62:03')
+  })
+})
+
+describe('formatChronoTime', () => {
+  it('formats as mm:ss:cc, for a live, dynamic-looking chrono', () => {
+    expect(formatChronoTime(0)).toBe('00:00:00')
+    expect(formatChronoTime(65_234)).toBe('01:05:23')
+    expect(formatChronoTime(3_723_009)).toBe('62:03:00')
   })
 })
