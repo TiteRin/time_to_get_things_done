@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { formatElapsedTime } from '@/domain/duration'
 import type { TimelineEntry } from '@/domain/session'
 import type { Task } from '@/domain/task'
 
@@ -9,13 +10,6 @@ const ENTRY_LABEL: Record<TimelineEntry['type'], string> = {
   resume: 'Reprise',
   complete: 'Tâche faite',
   finish: 'Session terminée',
-}
-
-function formatElapsed(ms: number): string {
-  const totalSeconds = Math.floor(ms / 1000)
-  const minutes = Math.floor(totalSeconds / 60)
-  const seconds = totalSeconds % 60
-  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
 
 /** Placeholder until the Débriefing screen exists: dumps the raw timeline */
@@ -44,7 +38,7 @@ export function SessionEndScreen({
           {timeline.map((entry, i) => (
             <li key={i} className="flex gap-4">
               <span className="text-muted-foreground tabular-nums">
-                {formatElapsed(entry.at - origin)}
+                {formatElapsedTime(entry.at - origin)}
               </span>
               <span>
                 {ENTRY_LABEL[entry.type]} · {tasks[entry.taskIndex]?.name}
