@@ -17,14 +17,14 @@ export function TaskList({
     <div className="flex flex-col gap-6">
       {groups.map((group) => (
         <section key={group.id ?? 'no-room'}>
-          <h2 className="mb-1 text-sm font-medium text-slate-400">{group.name}</h2>
-          <ul className="flex flex-col divide-y divide-slate-700">
+          <h2 className="mb-1 text-sm font-medium text-muted-foreground">{group.name}</h2>
+          <ul className="flex flex-col divide-y divide-border">
             {group.tasks.map((task) => (
               <li key={task.id}>
                 <button
                   type="button"
                   onClick={() => onSelect?.(task)}
-                  className="w-full py-3 text-left font-medium text-slate-100"
+                  className="w-full py-3 text-left font-medium text-foreground"
                 >
                   {task.name}
                 </button>

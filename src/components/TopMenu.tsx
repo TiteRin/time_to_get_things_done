@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { ThemeToggle } from './ThemeToggle'
 
 export function TopMenu({
   onCancel,
@@ -14,19 +15,20 @@ export function TopMenu({
       role="dialog"
       aria-modal="true"
       aria-label="Menu de la session"
-      className="absolute inset-0 flex flex-col justify-start gap-4 bg-slate-950/90 p-6 pt-[max(1.5rem,env(safe-area-inset-top))] backdrop-blur-sm"
+      className="absolute inset-0 flex flex-col justify-start gap-4 bg-background/90 p-6 pt-[max(1.5rem,env(safe-area-inset-top))] backdrop-blur-sm"
     >
+      <ThemeToggle className="absolute top-[max(1rem,env(safe-area-inset-top))] right-4" />
       <button
         type="button"
         onClick={onFinish}
-        className="rounded-2xl bg-emerald-500 px-6 py-5 text-xl font-semibold text-slate-950 active:bg-emerald-400"
+        className="rounded-2xl bg-accent px-6 py-5 text-xl font-semibold text-accent-foreground active:bg-accent/85"
       >
         Terminer
       </button>
       <button
         type="button"
         onClick={onCancel}
-        className="rounded-2xl border border-slate-600 px-6 py-5 text-xl font-semibold text-slate-100 active:bg-slate-800"
+        className="rounded-2xl border border-border px-6 py-5 text-xl font-semibold text-foreground active:bg-surface"
       >
         Annuler
       </button>

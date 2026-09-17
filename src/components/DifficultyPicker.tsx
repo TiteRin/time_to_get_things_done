@@ -24,8 +24,8 @@ export function DifficultyPicker({
             onClick={() => onChange(selected ? undefined : option)}
             className={`rounded-full border px-4 py-2 text-sm font-medium ${
               selected
-                ? 'border-emerald-400 bg-emerald-400 text-slate-950'
-                : 'border-slate-600 text-slate-200 active:bg-slate-800'
+                ? 'border-accent bg-accent text-accent-foreground'
+                : 'border-border text-foreground active:bg-surface'
             }`}
           >
             {label}

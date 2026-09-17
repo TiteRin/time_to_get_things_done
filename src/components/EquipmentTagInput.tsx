@@ -25,7 +25,7 @@ export function EquipmentTagInput({
 
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor={inputId} className="text-sm font-medium text-slate-300">
+      <label htmlFor={inputId} className="text-sm font-medium text-muted-foreground">
         Ajouter du matériel
       </label>
       {selected.length > 0 && (
@@ -33,14 +33,14 @@ export function EquipmentTagInput({
           {selected.map((item) => (
             <li
               key={item.id}
-              className="flex items-center gap-2 rounded-xl bg-slate-700 px-3 py-1 text-slate-100"
+              className="flex items-center gap-2 rounded-xl bg-surface-alt px-3 py-1 text-foreground"
             >
               {item.name}
               <button
                 type="button"
                 aria-label={`Retirer ${item.name}`}
                 onClick={() => onChange(value.filter((id) => id !== item.id))}
-                className="text-slate-400"
+                className="text-muted-foreground"
               >
                 ×
               </button>
@@ -59,12 +59,12 @@ export function EquipmentTagInput({
             event.preventDefault()
             submitNewEquipment()
           }}
-          className="flex-1 rounded-xl border border-slate-600 bg-slate-800 px-4 py-3 text-slate-100"
+          className="flex-1 rounded-xl border border-border bg-surface px-4 py-3 text-foreground"
         />
         <button
           type="button"
           onClick={submitNewEquipment}
-          className="rounded-xl bg-emerald-500 px-4 py-3 font-medium text-slate-950"
+          className="rounded-xl bg-accent px-4 py-3 font-medium text-accent-foreground"
         >
           Ajouter
         </button>

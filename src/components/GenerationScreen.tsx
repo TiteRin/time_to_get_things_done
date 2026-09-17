@@ -3,6 +3,7 @@ import type { DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { ReactNode } from 'react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import type { Equipment } from '@/domain/equipment'
 import type { Room } from '@/domain/room'
 import { groupTasksByRoom } from '@/domain/taskGrouping'
@@ -47,10 +48,13 @@ export function GenerationScreen({
 
   return (
     // The footer supplies the bottom padding so it can stick flush to the viewport
-    <main className="flex min-h-dvh flex-col bg-slate-900 p-6 pb-0">
-      <h1 className="mb-6 text-xl font-semibold text-slate-100">
-        {step === 'select' ? 'Choisir les tâches' : 'Ordonner les tâches'}
-      </h1>
+    <main className="flex min-h-dvh flex-col bg-background p-6 pb-0">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-foreground">
+          {step === 'select' ? 'Choisir les tâches' : 'Ordonner les tâches'}
+        </h1>
+        <ThemeToggle />
+      </div>
 
       <div className="flex-1">
         {step === 'select' ? (
@@ -71,8 +75,8 @@ export function GenerationScreen({
         )}
       </div>
 
-      <footer className="sticky bottom-0 -mx-6 mt-6 flex flex-col gap-4 border-t border-slate-800 bg-slate-900 px-6 pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-        <p aria-live="polite" className="text-center text-sm text-slate-400">
+      <footer className="sticky bottom-0 -mx-6 mt-6 flex flex-col gap-4 border-t border-border bg-background px-6 pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+        <p aria-live="polite" className="text-center text-sm text-muted-foreground">
           {summary}
         </p>
         <div className="flex gap-4">
@@ -81,7 +85,7 @@ export function GenerationScreen({
               type="button"
               onClick={onNextStep}
               disabled={count === 0}
-              className="flex-1 rounded-xl border border-slate-600 py-3 font-medium text-slate-100 disabled:opacity-40"
+              className="flex-1 rounded-xl border border-border py-3 font-medium text-foreground disabled:opacity-40"
             >
               Étape suivante
             </button>
@@ -89,7 +93,7 @@ export function GenerationScreen({
             <button
               type="button"
               onClick={onPreviousStep}
-              className="flex-1 rounded-xl border border-slate-600 py-3 font-medium text-slate-100"
+              className="flex-1 rounded-xl border border-border py-3 font-medium text-foreground"
             >
               Étape précédente
             </button>
@@ -98,7 +102,7 @@ export function GenerationScreen({
             type="button"
             onClick={onStart}
             disabled={count === 0}
-            className="flex-1 rounded-xl bg-emerald-500 py-3 font-medium text-slate-950 disabled:opacity-40"
+            className="flex-1 rounded-xl bg-accent py-3 font-medium text-accent-foreground disabled:opacity-40"
           >
             Démarrer
           </button>
@@ -144,8 +148,8 @@ function SelectionList({
     <div className="flex flex-col gap-6">
       {groups.map((group) => (
         <section key={group.id ?? 'no-room'}>
-          <h2 className="mb-1 text-sm font-medium text-slate-400">{group.name}</h2>
-          <ul className="flex flex-col divide-y divide-slate-700">
+          <h2 className="mb-1 text-sm font-medium text-muted-foreground">{group.name}</h2>
+          <ul className="flex flex-col divide-y divide-border">
             {group.tasks.map((task) => {
               const isSelected = selectedIds.has(task.id)
               return (
@@ -153,11 +157,11 @@ function SelectionList({
                 <li key={task.id} className="flex scroll-mb-40 items-center gap-4 py-3">
                   <span className="flex-1">
                     <span
-                      className={`block font-medium ${isSelected ? 'text-emerald-400' : 'text-slate-100'}`}
+                      className={`block font-medium ${isSelected ? 'text-accent-secondary' : 'text-foreground'}`}
                     >
                       {task.name}
                     </span>
-                    <span id={`task-details-${task.id}`} className="block text-sm text-slate-400">
+                    <span id={`task-details-${task.id}`} className="block text-sm text-muted-foreground">
                       {details(task)}
                     </span>
                   </span>
@@ -169,8 +173,8 @@ function SelectionList({
                     aria-label={`${isSelected ? 'Désélectionner' : 'Sélectionner'} ${task.name}`}
                     className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
                       isSelected
-                        ? 'bg-emerald-500 text-slate-950'
-                        : 'border border-slate-600 text-slate-100'
+                        ? 'bg-accent text-accent-foreground'
+                        : 'border border-border text-foreground'
                     }`}
                   >
                     {isSelected ? 'Désélectionner' : 'Sélectionner'}
@@ -221,7 +225,7 @@ function OrderingList({
         items={selected.map((task) => task.id)}
         strategy={verticalListSortingStrategy}
       >
-        <ul className="flex flex-col divide-y divide-slate-700">
+        <ul className="flex flex-col divide-y divide-border">
           {selected.map((task, index) => (
             <OrderingItem
               key={task.id}
@@ -257,7 +261,7 @@ function OrderingItem({
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className="flex items-center gap-4 bg-slate-900 py-3"
+      className="flex items-center gap-4 bg-background py-3"
     >
       <button
         type="button"
@@ -269,19 +273,19 @@ function OrderingItem({
           event.preventDefault()
           onReorder(index, event.key === 'ArrowDown' ? index + 1 : index - 1)
         }}
-        className="cursor-grab touch-none px-1 text-lg text-slate-400"
+        className="cursor-grab touch-none px-1 text-lg text-muted-foreground"
       >
         ⠿
       </button>
       <span className="flex-1">
-        <span className="block font-medium text-slate-100">{task.name}</span>
-        <span className="block text-sm text-slate-400">{roomName}</span>
+        <span className="block font-medium text-foreground">{task.name}</span>
+        <span className="block text-sm text-muted-foreground">{roomName}</span>
       </span>
       <button
         type="button"
         onClick={() => onRemove(task.id)}
         aria-label={`Retirer ${task.name}`}
-        className="rounded-lg border border-slate-600 px-3 py-1.5 text-sm font-medium text-slate-100"
+        className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-foreground"
       >
         Retirer
       </button>
