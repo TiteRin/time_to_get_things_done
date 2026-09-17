@@ -45,14 +45,14 @@ export function ExecutionScreen({
 
   return (
     <main
-      className="relative grid h-dvh w-full touch-none grid-rows-[20%_1fr_20%] overflow-hidden bg-slate-900 text-slate-50 select-none"
+      className="relative grid h-dvh w-full touch-none grid-rows-[20%_1fr_20%] overflow-hidden bg-background text-foreground select-none"
       {...(menuOpen ? {} : swipeHandlers)}
     >
       <button
         type="button"
         aria-label="Afficher le menu"
         onClick={onOpenMenu}
-        className="flex flex-col items-center justify-start gap-1 pt-[max(1rem,env(safe-area-inset-top))] text-slate-400 active:bg-slate-800/50"
+        className="flex flex-col items-center justify-start gap-1 pt-[max(1rem,env(safe-area-inset-top))] text-muted-foreground active:bg-surface/50"
       >
         <span className="text-sm tabular-nums">
           {position} / {total}
@@ -67,7 +67,7 @@ export function ExecutionScreen({
           type="button"
           aria-label={CENTER_LABEL[status]}
           onClick={onToggle}
-          className="absolute inset-0 active:bg-slate-800/30"
+          className="absolute inset-0 active:bg-surface/30"
         />
         <h1
           className={`pointer-events-none relative text-4xl font-bold text-balance transition-opacity ${
@@ -76,9 +76,12 @@ export function ExecutionScreen({
         >
           {task.name}
         </h1>
-        <p className="pointer-events-none relative flex items-center gap-2 text-slate-400">
+        <p className="pointer-events-none relative flex items-center gap-2 text-muted-foreground">
           {status === 'running' && (
-            <span aria-hidden="true" className="size-2 animate-pulse rounded-full bg-emerald-400" />
+            <span
+              aria-hidden="true"
+              className="size-2 animate-pulse rounded-full bg-accent-secondary"
+            />
           )}
           {STATUS_HINT[status]}
         </p>
@@ -88,7 +91,7 @@ export function ExecutionScreen({
         type="button"
         aria-label="Tâche suivante"
         onClick={onNext}
-        className="flex flex-col items-center justify-end gap-1 pb-[max(1rem,env(safe-area-inset-bottom))] text-slate-400 active:bg-slate-800/50"
+        className="flex flex-col items-center justify-end gap-1 pb-[max(1rem,env(safe-area-inset-bottom))] text-muted-foreground active:bg-surface/50"
       >
         <span aria-hidden="true" className="text-lg leading-none">
           ⌃

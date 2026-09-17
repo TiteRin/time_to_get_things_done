@@ -1,4 +1,35 @@
 @import 'tailwindcss';
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-thistle: #d5c3ca;
+  --color-sunlit-clay: #e9b15d;
+  --color-cherry-rose: #aa224b;
+
+  --color-background: #faf8f4;
+  --color-surface: #f5efe5;
+  --color-surface-alt: #efe6d8;
+  --color-foreground: #28151c;
+  --color-muted-foreground: #6b5761;
+  --color-border: #d6ccc2;
+
+  --color-accent: #aa224b;
+  --color-accent-foreground: #fdf7f8;
+  --color-accent-secondary: #8e5a0b;
+  --color-danger: #8a0f34;
+}
+
+.dark {
+  --color-background: #160e11;
+  --color-surface: #24191d;
+  --color-surface-alt: #322429;
+  --color-foreground: #f4ecef;
+  --color-muted-foreground: #b1a0a8;
+  --color-border: #4c393f;
+
+  --color-accent-secondary: #e9b15d;
+  --color-danger: #e9678e;
+}
 
 html,
 body,

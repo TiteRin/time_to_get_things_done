@@ -1,8 +1,12 @@
 import type { Preview } from '@storybook/react-vite'
+import { withThemeByClassName } from '@storybook/addon-themes'
 import { INITIAL_VIEWPORTS } from 'storybook/viewport'
 import '../src/index.css'
 
 const preview: Preview = {
+  decorators: [
+    withThemeByClassName({ themes: { clair: '', sombre: 'dark' }, defaultTheme: 'clair' }),
+  ],
   parameters: {
     layout: 'fullscreen',
     controls: {

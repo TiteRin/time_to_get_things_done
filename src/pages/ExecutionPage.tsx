@@ -36,10 +36,10 @@ function ExecutionSession({ tasks }: { tasks: Task[] }) {
         timeline={state.timeline}
         footer={
           <div className="flex flex-col gap-2">
-            <Link to="/" className="font-medium text-emerald-400">
+            <Link to="/" className="font-medium text-accent-secondary">
               Nouvelle liste
             </Link>
-            <Link to="/configuration" className="font-medium text-emerald-400">
+            <Link to="/configuration" className="font-medium text-accent-secondary">
               Configuration
             </Link>
           </div>
@@ -61,7 +61,7 @@ function ExecutionSession({ tasks }: { tasks: Task[] }) {
       onCloseMenu={closeMenu}
       onFinish={finish}
       menuExtra={
-        <Link to="/configuration" className="font-medium text-emerald-400">
+        <Link to="/configuration" className="font-medium text-accent-secondary">
           Configuration
         </Link>
       }

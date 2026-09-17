@@ -26,14 +26,14 @@ export function RoomSelect({
 
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor={selectId} className="text-sm font-medium text-slate-300">
+      <label htmlFor={selectId} className="text-sm font-medium text-muted-foreground">
         Pièce
       </label>
       <select
         id={selectId}
         value={value ?? ''}
         onChange={(event) => onChange(event.target.value || undefined)}
-        className="rounded-xl border border-slate-600 bg-slate-800 px-4 py-3 text-slate-100"
+        className="rounded-xl border border-border bg-surface px-4 py-3 text-foreground"
       >
         <option value="">Aucune pièce</option>
         {rooms.map((room) => (
@@ -56,12 +56,12 @@ export function RoomSelect({
               event.preventDefault()
               submitNewRoom()
             }}
-            className="flex-1 rounded-xl border border-slate-600 bg-slate-800 px-4 py-3 text-slate-100"
+            className="flex-1 rounded-xl border border-border bg-surface px-4 py-3 text-foreground"
           />
           <button
             type="button"
             onClick={submitNewRoom}
-            className="rounded-xl bg-emerald-500 px-4 py-3 font-medium text-slate-950"
+            className="rounded-xl bg-accent px-4 py-3 font-medium text-accent-foreground"
           >
             Ajouter
           </button>
@@ -70,7 +70,7 @@ export function RoomSelect({
         <button
           type="button"
           onClick={() => setAdding(true)}
-          className="self-start text-sm text-emerald-400 underline"
+          className="self-start text-sm text-accent-secondary underline"
         >
           Nouvelle pièce
         </button>

@@ -42,7 +42,7 @@ export function GenerationPage() {
         navigate('/execution')
       }}
       footerExtra={
-        <Link to="/configuration" className="text-center font-medium text-emerald-400">
+        <Link to="/configuration" className="text-center font-medium text-accent-secondary">
           Configuration
         </Link>
       }

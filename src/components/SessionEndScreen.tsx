@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import type { TimelineEntry } from '@/domain/session'
 import type { Task } from '@/domain/task'
 
@@ -30,16 +31,19 @@ export function SessionEndScreen({
   const origin = timeline[0]?.at ?? 0
 
   return (
-    <main className="min-h-dvh bg-slate-900 px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-8 text-slate-50">
-      <h1 className="mb-6 text-3xl font-bold">Session terminée</h1>
+    <main className="min-h-dvh bg-background px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-8 text-foreground">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Session terminée</h1>
+        <ThemeToggle />
+      </div>
 
       {timeline.length === 0 ? (
-        <p className="text-slate-400">Aucune action enregistrée.</p>
+        <p className="text-muted-foreground">Aucune action enregistrée.</p>
       ) : (
         <ol aria-label="Timeline" className="flex flex-col gap-3">
           {timeline.map((entry, i) => (
             <li key={i} className="flex gap-4">
-              <span className="text-slate-400 tabular-nums">
+              <span className="text-muted-foreground tabular-nums">
                 {formatElapsed(entry.at - origin)}
               </span>
               <span>
