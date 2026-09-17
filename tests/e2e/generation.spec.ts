@@ -17,7 +17,7 @@ async function dragHandle(page: Page, fromTask: string, toTask: string) {
 }
 
 test('builds a list, reorders it, and finds it back on the next visit', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/generation')
 
   await select(page, 'Nettoyer les fontaines')
   await select(page, 'Faire la vaisselle')
@@ -44,7 +44,7 @@ test('builds a list, reorders it, and finds it back on the next visit', async ({
   await expect(page.getByText('1 / 2')).toBeVisible()
 
   // The last list is restored on the next visit
-  await page.goto('/')
+  await page.goto('/generation')
   await expect(page.getByText(/2 tâches sélectionnées/)).toBeVisible()
   await expect(
     page.getByRole('button', { name: 'Désélectionner Faire les litières' }),
@@ -54,7 +54,7 @@ test('builds a list, reorders it, and finds it back on the next visit', async ({
 test('cannot start with an empty selection and redirects to the generation screen', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/generation')
   await expect(page.getByRole('button', { name: 'Démarrer' })).toBeDisabled()
   await expect(page.getByRole('heading', { name: 'Salon' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Étape suivante' })).toBeDisabled()
