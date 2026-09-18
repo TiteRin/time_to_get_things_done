@@ -70,7 +70,7 @@ Tests never live next to source. They sit under `tests/<kind>/` and mirror the p
 - **Stack**: PWA — React + Vite, installable on mobile. Single codebase, no native app store distribution.
 - **Persistence**: 100% local (IndexedDB/localStorage) for the MVP. No backend, no auth, no cross-device sync.
 - **UI language**: French (primary target users are French-speaking). Code identifiers and comments follow standard English convention.
-- **Git**: commit messages in French, Conventional Commits format (concise one-line subject, optional bullet points below). One branch per feature.
+- **Git**: commit messages in French, Conventional Commits format (concise one-line subject, optional bullet points below). One branch per feature. No AI attribution: no `Co-Authored-By: Claude` trailer in commits, no "Generated with Claude Code" line in PR descriptions.
 
 ## Domain model
 
