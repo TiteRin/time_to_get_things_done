@@ -1,0 +1,14 @@
+{
+  "projectId": "1bc08f57-00aa-4fab-80e0-38319fd3fec7",
+  "shape": "storybook",
+  "pkg": "time-to-get-things-done",
+  "globalName": "TtgtdUi",
+  "entry": ".design-sync/entry.ts",
+  "tsconfig": "tsconfig-paths.json",
+  "storybookStatic": ".design-sync/sb-reference",
+  "buildCmd": "npx tsc -p .design-sync/tsconfig.emit-types.json",
+  "readmeHeader": ".design-sync/conventions.md",
+  "overrides": {
+    "GroupedTaskList": { "viewport": "900x900" }
+  }
+}
