@@ -4,10 +4,10 @@ import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-
 import { CSS } from '@dnd-kit/utilities'
 import type { ReactNode } from 'react'
 import { Button } from '@/components/ui/Button'
+import { GroupedTaskList } from '@/components/ui/GroupedTaskList'
 import { ScreenHeader } from '@/components/ui/ScreenHeader'
 import type { Equipment } from '@/domain/equipment'
 import type { Room } from '@/domain/room'
-import { groupTasksByRoom } from '@/domain/taskGrouping'
 import { difficultyLabels } from '@/domain/task'
 import type { Task } from '@/domain/task'
 import { totalExpectedDuration } from '@/domain/taskSelection'
@@ -118,8 +118,6 @@ function SelectionList({
 }) {
   const selectedIds = new Set(selected.map((task) => task.id))
   const equipmentById = new Map(equipment.map((item) => [item.id, item.name]))
-  const groups = groupTasksByRoom(tasks, rooms)
-
   // Duration and difficulty are always labelled, even when not filled in yet
   const details = (task: Task) => {
     const equipmentNames = task.equipmentIds
@@ -135,46 +133,39 @@ function SelectionList({
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      {groups.map((group) => (
-        <section key={group.id ?? 'no-room'}>
-          <h2 className="mb-1 text-sm font-medium text-muted-foreground">{group.name}</h2>
-          <ul className="flex flex-col divide-y divide-border">
-            {group.tasks.map((task) => {
-              const isSelected = selectedIds.has(task.id)
-              return (
-                // scroll-mb keeps a focused row visible above the sticky footer
-                <li key={task.id} className="flex scroll-mb-40 items-center gap-4 py-3">
-                  <span className="flex-1">
-                    <span
-                      className={`block font-medium ${isSelected ? 'text-accent-secondary' : 'text-foreground'}`}
-                    >
-                      {task.name}
-                    </span>
-                    <span
-                      id={`task-details-${task.id}`}
-                      className="block text-sm text-muted-foreground"
-                    >
-                      {details(task)}
-                    </span>
-                  </span>
-                  <Button
-                    size="sm"
-                    variant={isSelected ? 'primary' : 'secondary'}
-                    onClick={() => onToggle(task.id)}
-                    aria-pressed={isSelected}
-                    aria-describedby={`task-details-${task.id}`}
-                    aria-label={`${isSelected ? 'Désélectionner' : 'Sélectionner'} ${task.name}`}
-                  >
-                    {isSelected ? 'Désélectionner' : 'Sélectionner'}
-                  </Button>
-                </li>
-              )
-            })}
-          </ul>
-        </section>
-      ))}
-    </div>
+    <GroupedTaskList
+      tasks={tasks}
+      rooms={rooms}
+      // scroll-mb keeps a focused row visible above the sticky footer
+      rowClassName="flex scroll-mb-40 items-center gap-4 py-3"
+      renderRow={(task) => {
+        const isSelected = selectedIds.has(task.id)
+        return (
+          <>
+            <span className="flex-1">
+              <span
+                className={`block font-medium ${isSelected ? 'text-accent-secondary' : 'text-foreground'}`}
+              >
+                {task.name}
+              </span>
+              <span id={`task-details-${task.id}`} className="block text-sm text-muted-foreground">
+                {details(task)}
+              </span>
+            </span>
+            <Button
+              size="sm"
+              variant={isSelected ? 'primary' : 'secondary'}
+              onClick={() => onToggle(task.id)}
+              aria-pressed={isSelected}
+              aria-describedby={`task-details-${task.id}`}
+              aria-label={`${isSelected ? 'Désélectionner' : 'Sélectionner'} ${task.name}`}
+            >
+              {isSelected ? 'Désélectionner' : 'Sélectionner'}
+            </Button>
+          </>
+        )
+      }}
+    />
   )
 }
 
