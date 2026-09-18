@@ -23,6 +23,16 @@ WebKit is not installed (needs system libs: `sudo npx playwright install-deps we
 
 TDD: write the failing test first (Vitest for logic/hooks/components, a story per visual state, Playwright for user flows), then implement.
 
+## PR automation
+
+Three GitHub Actions workflows run alongside `.github/workflows/ci.yml`, using the Claude GitHub App (`anthropics/claude-code-action`):
+
+- `claude-review.yml` (on PR opened/synchronize/reopened) — Claude reviews the diff against this file's conventions and posts findings as a PR comment. **Advisory only**: it never approves or blocks the merge.
+- `ci-watch.yml` (on the `CI` workflow completing) — if CI failed, Claude reads the failing job's logs and posts a diagnosis + suggested fix as a comment (it never pushes a commit or edits files); if CI passed, it posts a plain "ready to merge, reply `/merge`" comment.
+- `merge-on-command.yml` (on an `/merge` comment from the repo owner/a member/collaborator) — deterministically re-checks the PR's status checks and squash-merges if they're green, no LLM involved.
+
+Merging is never autonomous: a human always types `/merge`. Setup prerequisites (one-time, repo admin): install https://github.com/apps/claude on this repo, and add a repo secret named either `ANTHROPIC_API_KEY` or `CLAUDE_CODE_OAUTH_TOKEN` (not both) under Settings → Secrets and variables → Actions.
+
 ## Architecture
 
 Source is organized by technical kind (not by feature); add new top-level folders under `src/` as needs arise. Import across folders with the `@/` alias (→ `src/`), relative imports only within the same folder.

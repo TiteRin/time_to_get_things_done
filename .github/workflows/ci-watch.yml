@@ -1,0 +1,84 @@
+name: Suivi de la CI sur les PR
+
+# Reacts to the "CI" workflow (.github/workflows/ci.yml) once it finishes on a pull request:
+# diagnoses failures (comment only, no pushed fix) and announces when it's ready to merge.
+on:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
+
+jobs:
+  diagnose-failure:
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: write
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          additional_permissions: |
+            actions: read
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+            FAILED CI RUN ID: ${{ github.event.workflow_run.id }}
+
+            The "CI" workflow (lint, prettier, build, unit/integration/storybook tests,
+            or the Playwright e2e job) just failed on this pull request. The failing
+            commit is already checked out in the current working directory.
+
+            Investigate with:
+              gh run view ${{ github.event.workflow_run.id }} --log-failed
+
+            Read CLAUDE.md for this project's conventions before proposing anything
+            (e.g. E2E tests must use page.clock.setFixedTime, never clock.install;
+            pages must wait for every useLiveQuery before rendering).
+
+            Diagnose the root cause, then post ONE PR comment with `gh pr comment`
+            containing:
+            - a short explanation of why it failed
+            - a concrete suggested fix: either the exact diff/snippet to apply, or the
+              exact command to run locally
+            If you cannot pin down the cause from the logs, say so plainly instead of
+            guessing.
+
+            Do not push any commits, do not modify any files - comment only.
+
+          claude_args: |
+            --allowedTools "Bash(gh run view:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
+
+  announce-green:
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Comment that the PR is ready to merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          gh pr comment "$PR_NUMBER" --repo "$REPO" --body "$(cat <<EOF
+          ✅ CI verte sur \`${SHA:0:7}\`.
+
+          Réponds \`/merge\` sur cette PR pour la fusionner (squash).
+          EOF
+          )"

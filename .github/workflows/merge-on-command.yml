@@ -1,0 +1,35 @@
+name: Fusion sur commande
+
+# A maintainer replies "/merge" on a PR once they're happy with it. No LLM involved:
+# this just re-verifies CI is green (defense in depth) and merges deterministically.
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  merge:
+    if: >
+      github.event.issue.pull_request != null &&
+      github.event.comment.body == '/merge' &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Check CI status and merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          rollup=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json statusCheckRollup \
+            --jq '[.statusCheckRollup[].conclusion] - ["SUCCESS", "SKIPPED", "NEUTRAL"] | length')
+
+          if [ "$rollup" != "0" ]; then
+            gh pr comment "$PR_NUMBER" --repo "$REPO" --body \
+              "❌ Fusion refusée : au moins une vérification n'est pas au vert. Relance \`/merge\` une fois la CI verte."
+            exit 1
+          fi
+
+          gh pr merge "$PR_NUMBER" --repo "$REPO" --squash --delete-branch
