@@ -27,7 +27,7 @@ const storedTask = (page: Page, name: string) =>
   )
 
 test('debriefs a session and corrects a task from it', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/generation')
   await page.getByRole('button', { name: 'Sélectionner Faire la vaisselle' }).click()
   await page.getByRole('button', { name: 'Sélectionner Faire les litières' }).click()
   await elapsed(page, 0)
