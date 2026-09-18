@@ -1,39 +1,20 @@
 import type { ComponentPropsWithoutRef } from 'react'
+import { buttonClassName } from './buttonClassName'
+import type { ButtonSize, ButtonVariant } from './buttonClassName'
 
-export type ButtonVariant = 'primary' | 'secondary'
-export type ButtonSize = 'sm' | 'md' | 'lg'
-
-const VARIANT: Record<ButtonVariant, string> = {
-  primary: 'bg-accent text-accent-foreground active:bg-accent/85',
-  secondary: 'border border-border text-foreground active:bg-surface',
-}
-
-const SIZE: Record<ButtonSize, string> = {
-  sm: 'rounded-lg px-3 py-1.5 text-sm font-medium',
-  md: 'rounded-xl px-4 py-3 font-medium',
-  lg: 'rounded-2xl px-6 py-4 text-lg font-semibold',
-}
-
-/** Exposed for elements that must match a button's box without being one (layout placeholders) */
-export function buttonClassName({
-  variant = 'primary',
-  size = 'md',
-}: { variant?: ButtonVariant; size?: ButtonSize } = {}): string {
-  return `${SIZE[size]} ${VARIANT[variant]} disabled:opacity-40`
-}
-
-export function Button({
-  variant,
-  size,
-  type = 'button',
-  className,
-  ...props
-}: {
+export type ButtonProps = {
+  /** `primary`: the screen's main action, filled with the accent color. `secondary`: alternatives and cancellations, outlined. */
   variant?: ButtonVariant
+  /** `lg`: full-width actions on immersive screens (Exécution, Chrono, home). `md`: in-page actions and forms. `sm`: inline actions on a list row. */
   size?: ButtonSize
-} & ComponentPropsWithoutRef<'button'>) {
+} & ComponentPropsWithoutRef<'button'>
+
+/**
+ * The app's only button style. Defaults to `type="button"` so it never submits a form by
+ * accident; pass `type="submit"` explicitly. Extra `className` is appended (layout only,
+ * e.g. `flex-1`), and every native button attribute is forwarded.
+ */
+export function Button({ variant, size, type = 'button', className, ...props }: ButtonProps) {
   const base = buttonClassName({ variant, size })
-  return (
-    <button type={type} className={className ? `${base} ${className}` : base} {...props} />
-  )
+  return <button type={type} className={className ? `${base} ${className}` : base} {...props} />
 }

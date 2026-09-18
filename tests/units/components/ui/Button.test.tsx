@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { Button, buttonClassName } from '@/components/ui/Button'
+import { Button } from '@/components/ui/Button'
+import { buttonClassName } from '@/components/ui/buttonClassName'
 
 describe('Button', () => {
   it('renders a non-submitting button by default', () => {
@@ -51,20 +52,5 @@ describe('Button', () => {
       ...buttonClassName({ variant: 'secondary', size: 'lg' }).split(' '),
       'flex-1',
     )
-  })
-})
-
-describe('buttonClassName', () => {
-  it('defaults to a medium primary button', () => {
-    expect(buttonClassName()).toBe(buttonClassName({ variant: 'primary', size: 'md' }))
-  })
-
-  it('differs per variant and per size', () => {
-    const classNames = new Set(
-      (['primary', 'secondary'] as const).flatMap((variant) =>
-        (['sm', 'md', 'lg'] as const).map((size) => buttonClassName({ variant, size })),
-      ),
-    )
-    expect(classNames.size).toBe(6)
   })
 })
