@@ -28,7 +28,7 @@ async function swipeUp(page: Page) {
 }
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/generation')
   // Build the session list on the generation screen
   for (const name of ['Nettoyer les fontaines', 'Faire la vaisselle', 'Faire les litières']) {
     await page.getByRole('button', { name: `Sélectionner ${name}` }).click()

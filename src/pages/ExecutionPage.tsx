@@ -22,7 +22,7 @@ function LastListSession() {
 
   const byId = new Map(tasks.map((task) => [task.id, task]))
   const list = ids.flatMap((id) => byId.get(id) ?? [])
-  if (list.length === 0) return <Navigate to="/" replace />
+  if (list.length === 0) return <Navigate to="/generation" replace />
 
   return <ExecutionSession tasks={list} />
 }
@@ -48,7 +48,7 @@ function ExecutionSession({ tasks }: { tasks: Task[] }) {
       onCloseMenu={closeMenu}
       onFinish={finish}
       menuExtra={
-        <Link to="/configuration" className="font-medium text-emerald-400">
+        <Link to="/configuration" className="font-medium text-accent-secondary">
           Configuration
         </Link>
       }
@@ -78,7 +78,7 @@ function SessionDebriefing({
       timeline={timeline}
       onUpdateTask={(task) => void updateTask(task)}
       onRestart={onRestart}
-      onClose={() => navigate('/')}
+      onClose={() => navigate('/generation')}
     />
   )
 }

@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react'
+import { ActionOverlay } from '@/components/ui/ActionOverlay'
+import { ThemeToggle } from './ThemeToggle'
 
 export function TopMenu({
   onCancel,
@@ -10,27 +12,16 @@ export function TopMenu({
   children?: ReactNode
 }) {
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Menu de la session"
-      className="absolute inset-0 flex flex-col justify-start gap-4 bg-slate-950/90 p-6 pt-[max(1.5rem,env(safe-area-inset-top))] backdrop-blur-sm"
+    <ActionOverlay
+      label="Menu de la session"
+      align="top"
+      actions={[
+        { label: 'Terminer', onClick: onFinish },
+        { label: 'Annuler', variant: 'secondary', onClick: onCancel },
+      ]}
+      corner={<ThemeToggle />}
     >
-      <button
-        type="button"
-        onClick={onFinish}
-        className="rounded-2xl bg-emerald-500 px-6 py-5 text-xl font-semibold text-slate-950 active:bg-emerald-400"
-      >
-        Terminer
-      </button>
-      <button
-        type="button"
-        onClick={onCancel}
-        className="rounded-2xl border border-slate-600 px-6 py-5 text-xl font-semibold text-slate-100 active:bg-slate-800"
-      >
-        Annuler
-      </button>
-      {children && <div className="mt-2 text-center">{children}</div>}
-    </div>
+      {children}
+    </ActionOverlay>
   )
 }

@@ -93,3 +93,31 @@ export function actualDurationMs(timeline: TimelineEntry[], taskIndex: number): 
 
   return total
 }
+
+/** Like actualDurationMs, but also counts a still-running segment up to `now` (for a live display) */
+export function elapsedMs(timeline: TimelineEntry[], taskIndex: number, now: number): number {
+  let total = 0
+  let runningSince: number | null = null
+
+  for (const entry of timeline) {
+    if (entry.taskIndex !== taskIndex) continue
+    if (entry.type === 'start' || entry.type === 'resume') {
+      runningSince = entry.at
+    } else if (runningSince !== null) {
+      total += entry.at - runningSince
+      runningSince = null
+    }
+  }
+
+  if (runningSince !== null) total += now - runningSince
+  return total
+}
+
+/** Wall-clock time from the first start to the last recorded event, pauses included */
+export function totalDurationMs(timeline: TimelineEntry[], taskIndex: number): number {
+  const entries = timeline.filter((entry) => entry.taskIndex === taskIndex)
+  const start = entries.find((entry) => entry.type === 'start')
+  if (!start) return 0
+
+  return entries.at(-1)!.at - start.at
+}

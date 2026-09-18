@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { TaskForm } from '@/components/TaskForm'
 import { TaskList } from '@/components/TaskList'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import type { Task } from '@/domain/task'
 import { useEquipment } from '@/hooks/useEquipment'
 import { useRooms } from '@/hooks/useRooms'
@@ -20,8 +21,11 @@ export function ConfigurationPage() {
   const loading = !tasks || !rooms || !equipment
 
   return (
-    <main className="min-h-dvh bg-slate-900 p-6">
-      <h1 className="mb-6 text-xl font-semibold text-slate-100">Configuration</h1>
+    <main className="min-h-dvh bg-background p-6">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-foreground">Configuration</h1>
+        <ThemeToggle />
+      </div>
 
       {loading ? null : form.open ? (
         <TaskForm
@@ -41,7 +45,7 @@ export function ConfigurationPage() {
           <button
             type="button"
             onClick={() => setForm({ open: true })}
-            className="mb-6 rounded-xl bg-emerald-500 px-4 py-3 font-medium text-slate-950"
+            className="mb-6 rounded-xl bg-accent px-4 py-3 font-medium text-accent-foreground"
           >
             Ajouter une tâche
           </button>
@@ -50,7 +54,10 @@ export function ConfigurationPage() {
             rooms={rooms}
             onSelect={(task) => setForm({ open: true, task })}
           />
-          <Link to="/" className="mt-6 block text-center font-medium text-emerald-400">
+          <Link
+            to="/generation"
+            className="mt-6 block text-center font-medium text-accent-secondary"
+          >
             Créer une liste
           </Link>
         </>

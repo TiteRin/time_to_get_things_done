@@ -21,7 +21,7 @@ function routedWrapper(db: TtgtdDatabase = openDatabase()) {
       <MemoryRouter initialEntries={['/execution']}>
         <DatabaseWrapper>
           <Routes>
-            <Route path="/" element={<h1>Écran de génération</h1>} />
+            <Route path="/generation" element={<h1>Écran de génération</h1>} />
             <Route path="/execution" element={children} />
           </Routes>
         </DatabaseWrapper>

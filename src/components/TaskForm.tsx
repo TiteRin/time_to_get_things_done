@@ -3,6 +3,7 @@ import { DifficultyPicker } from '@/components/DifficultyPicker'
 import { DurationPicker } from '@/components/DurationPicker'
 import { EquipmentTagInput } from '@/components/EquipmentTagInput'
 import { RoomSelect } from '@/components/RoomSelect'
+import { Button } from '@/components/ui/Button'
 import type { Equipment } from '@/domain/equipment'
 import type { Room } from '@/domain/room'
 import type { Difficulty, Task } from '@/domain/task'
@@ -89,7 +90,7 @@ export function TaskForm({
       className="flex flex-col gap-6"
     >
       <div className="flex flex-col gap-2">
-        <label htmlFor={nameId} className="text-sm font-medium text-slate-300">
+        <label htmlFor={nameId} className="text-sm font-medium text-muted-foreground">
           Nom
         </label>
         <input
@@ -97,7 +98,7 @@ export function TaskForm({
           type="text"
           value={name}
           onChange={(event) => setName(event.target.value)}
-          className="rounded-xl border border-slate-600 bg-slate-800 px-4 py-3 text-slate-100"
+          className="rounded-xl border border-border bg-surface px-4 py-3 text-foreground"
         />
       </div>
 
@@ -117,17 +118,12 @@ export function TaskForm({
       />
 
       {error && (
-        <p role="alert" className="text-sm text-red-400">
+        <p role="alert" className="text-sm text-danger">
           {error}
         </p>
       )}
 
-      <button
-        type="submit"
-        className="rounded-xl bg-emerald-500 px-4 py-3 font-medium text-slate-950"
-      >
-        Enregistrer
-      </button>
+      <Button type="submit">Enregistrer</Button>
     </form>
   )
 }
