@@ -1,4 +1,6 @@
-const PRESETS = [5, 10, 15, 20, 30, 45, 60]
+import { Chip } from '@/components/ui/Chip'
+
+const PRESETS =[5, 10, 15, 20, 30, 45, 60]
 
 function formatDuration(minutes: number): string {
   if (minutes < 60) return `${minutes} min`
@@ -24,19 +26,14 @@ export function DurationPicker({
       {options.map((minutes) => {
         const selected = minutes === value
         return (
-          <button
+          <Chip
             key={minutes}
-            type="button"
-            aria-pressed={selected}
+            selected={selected}
             onClick={() => onChange(selected ? undefined : minutes)}
-            className={`rounded-full border px-4 py-2 text-sm font-medium tabular-nums ${
-              selected
-                ? 'border-accent bg-accent text-accent-foreground'
-                : 'border-border text-foreground active:bg-surface'
-            }`}
+            className="tabular-nums"
           >
             {formatDuration(minutes)}
-          </button>
+          </Chip>
         )
       })}
     </div>
