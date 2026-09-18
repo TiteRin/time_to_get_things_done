@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Button } from '@/components/ui/Button'
 import { buttonClassName } from '@/components/ui/buttonClassName'
+import { StatusHint } from '@/components/ui/StatusHint'
+import { TapToggle } from '@/components/ui/TapToggle'
 import { formatChronoTime } from '@/domain/duration'
 import type { SessionStatus } from '@/domain/session'
 import type { Task } from '@/domain/task'
@@ -15,13 +17,6 @@ export type ChronoScreenProps = {
   onFinish: () => void
   onCancel: () => void
 }
-
-const CENTER_LABEL = { idle: 'Démarrer', running: 'Pause', paused: 'Reprendre' } as const
-const STATUS_HINT = {
-  idle: 'Touchez pour commencer',
-  running: 'En cours',
-  paused: 'En pause',
-} as const
 
 const FINISH_SAFE_AREA = 'pb-[max(1rem,env(safe-area-inset-bottom))]'
 
@@ -59,27 +54,14 @@ export function ChronoScreen({
       </div>
 
       <div className="relative flex flex-col items-center justify-center gap-6 px-6 text-center">
-        <button
-          type="button"
-          aria-label={CENTER_LABEL[status]}
-          onClick={onToggle}
-          className="absolute inset-0 active:bg-surface/30"
-        />
+        <TapToggle status={status} onToggle={onToggle} />
         <h1 className="pointer-events-none relative text-3xl font-bold text-balance">
           {task.name}
         </h1>
         <p className="pointer-events-none relative font-mono text-5xl tabular-nums">
           {formatChronoTime(elapsedMs)}
         </p>
-        <p className="pointer-events-none relative flex items-center gap-2 text-muted-foreground">
-          {status === 'running' && (
-            <span
-              aria-hidden="true"
-              className="size-2 animate-pulse rounded-full bg-accent-secondary"
-            />
-          )}
-          {STATUS_HINT[status]}
-        </p>
+        <StatusHint status={status} />
       </div>
 
       {/* Reserves the row's space even when hidden, so it doesn't shift the centered
