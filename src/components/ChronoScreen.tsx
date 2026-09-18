@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { ActionOverlay } from '@/components/ui/ActionOverlay'
 import { Button } from '@/components/ui/Button'
 import { buttonClassName } from '@/components/ui/buttonClassName'
 import { StatusHint } from '@/components/ui/StatusHint'
@@ -80,22 +81,14 @@ export function ChronoScreen({
       )}
 
       {confirmingCancel && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Confirmer l'abandon"
-          className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-background/90 p-6 text-center backdrop-blur-sm"
-        >
-          <p className="text-lg font-medium">Abandonner ce chronométrage ?</p>
-          <div className="flex w-full flex-col gap-3">
-            <Button size="lg" variant="secondary" onClick={onCancel}>
-              Abandonner
-            </Button>
-            <Button size="lg" onClick={() => setConfirmingCancel(false)}>
-              Continuer
-            </Button>
-          </div>
-        </div>
+        <ActionOverlay
+          label="Confirmer l'abandon"
+          message="Abandonner ce chronométrage ?"
+          actions={[
+            { label: 'Abandonner', variant: 'secondary', onClick: onCancel },
+            { label: 'Continuer', onClick: () => setConfirmingCancel(false) },
+          ]}
+        />
       )}
     </main>
   )
