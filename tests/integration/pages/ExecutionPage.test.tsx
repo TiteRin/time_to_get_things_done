@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { MemoryRouter, Route, Routes } from 'react-router'
@@ -14,7 +14,7 @@ const openDatabase = setupTestDatabases()
 
 beforeEach(() => window.localStorage.clear())
 
-function routedWrapper(db: TtgtdDatabase) {
+function routedWrapper(db: TtgtdDatabase = openDatabase()) {
   const DatabaseWrapper = databaseWrapper(db)
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
@@ -38,7 +38,7 @@ const tasks: Task[] = [
 describe('ExecutionPage', () => {
   it('runs through every task then shows the end screen', async () => {
     const user = userEvent.setup()
-    render(<ExecutionPage tasks={tasks} />, { wrapper: MemoryRouter })
+    render(<ExecutionPage tasks={tasks} />, { wrapper: routedWrapper() })
 
     expect(screen.getByRole('heading', { name: 'Faire la vaisselle' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Démarrer' }))
@@ -48,17 +48,24 @@ describe('ExecutionPage', () => {
     expect(screen.getByRole('button', { name: 'Démarrer' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Tâche suivante' }))
 
-    expect(screen.getByRole('heading', { name: 'Session terminée' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Bravo !' })).toBeInTheDocument()
   })
 
-  it('ends the session early from the top menu', async () => {
+  it('ends the session early from the top menu, then restarts it', async () => {
     const user = userEvent.setup()
-    render(<ExecutionPage tasks={tasks} />, { wrapper: MemoryRouter })
+    render(<ExecutionPage tasks={tasks} />, { wrapper: routedWrapper() })
 
     await user.click(screen.getByRole('button', { name: 'Afficher le menu' }))
     await user.click(screen.getByRole('button', { name: 'Terminer' }))
 
-    expect(screen.getByRole('heading', { name: 'Session terminée' })).toBeInTheDocument()
+    // Nothing was done: the debriefing offers to run the list again
+    expect(
+      await screen.findByRole('heading', { name: 'Aucune tâche effectuée' }),
+    ).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Relancer' }))
+
+    expect(screen.getByRole('heading', { name: 'Faire la vaisselle' })).toBeInTheDocument()
+    expect(screen.getByText('1 / 2')).toBeInTheDocument()
   })
 
   it('runs the last saved list, in its saved order', async () => {
@@ -71,6 +78,66 @@ describe('ExecutionPage', () => {
 
     expect(await screen.findByRole('heading', { name: 'Faire la vaisselle' })).toBeInTheDocument()
     expect(screen.getByText('1 / 2')).toBeInTheDocument()
+  })
+
+  it('updates the expected duration from the debriefing, then closes it', async () => {
+    const user = userEvent.setup()
+    const db = openDatabase()
+    const stored = await taskRepository.listTasks(db)
+    const dishes = stored.find((task) => task.name === 'Faire la vaisselle')!
+    saveLastList([dishes.id])
+
+    render(<ExecutionPage />, { wrapper: routedWrapper(db) })
+
+    await user.click(await screen.findByRole('button', { name: 'Démarrer' }))
+    await user.click(screen.getByRole('button', { name: 'Tâche suivante' }))
+    expect(
+      await screen.findByText('1 tâche effectuée sur 1, temps passé : 0 minute'),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Faire la vaisselle' }))
+    await user.click(screen.getByRole('button', { name: 'Modifier la durée prévue' }))
+    const presets = within(screen.getByRole('group', { name: 'Durée prévue' }))
+    await user.click(presets.getByRole('button', { name: '10 min' }))
+
+    await waitFor(async () => expect((await db.tasks.get(dishes.id))?.expectedDuration).toBe(10))
+    // The live query re-renders after the write: wait for the text, not just the button
+    await waitFor(() =>
+      expect(
+        within(screen.getByRole('dialog')).getByRole('button', {
+          name: 'Modifier la durée prévue',
+        }),
+      ).toHaveTextContent('10 min'),
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Fermer le détail' }))
+    await user.click(screen.getByRole('button', { name: 'Fermer' }))
+    expect(await screen.findByRole('heading', { name: 'Écran de génération' })).toBeInTheDocument()
+  })
+
+  it('shows the perceived difficulty as selected once corrected', async () => {
+    const user = userEvent.setup()
+    const db = openDatabase()
+    const stored = await taskRepository.listTasks(db)
+    const dishes = stored.find((task) => task.name === 'Faire la vaisselle')!
+    saveLastList([dishes.id])
+
+    render(<ExecutionPage />, { wrapper: routedWrapper(db) })
+
+    await user.click(await screen.findByRole('button', { name: 'Démarrer' }))
+    await user.click(screen.getByRole('button', { name: 'Tâche suivante' }))
+    await user.click(await screen.findByRole('button', { name: 'Faire la vaisselle' }))
+    await user.click(screen.getByRole('button', { name: 'Renseigner la difficulté' }))
+
+    const perceived = within(screen.getByRole('group', { name: 'Difficulté perçue' }))
+    await user.click(perceived.getByRole('button', { name: 'Difficile' }))
+
+    await waitFor(() =>
+      expect(perceived.getByRole('button', { name: 'Difficile' })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      ),
+    )
   })
 
   it('goes back to the generation screen without a saved list', async () => {

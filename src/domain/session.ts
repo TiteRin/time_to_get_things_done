@@ -19,7 +19,7 @@ export type SessionState = {
 /** Timestamps are injected so the reducer stays pure and deterministic */
 export type SessionEvent =
   | { type: 'START' | 'PAUSE' | 'RESUME' | 'NEXT' | 'FINISH'; at: number }
-  | { type: 'OPEN_MENU' | 'CLOSE_MENU' }
+  | { type: 'OPEN_MENU' | 'CLOSE_MENU' | 'RESTART' }
 
 export function createSession(tasks: Task[]): SessionState {
   return {
@@ -36,6 +36,8 @@ function record(state: SessionState, type: TimelineEntry['type'], at: number): T
 }
 
 export function sessionReducer(state: SessionState, event: SessionEvent): SessionState {
+  // The only way out of an ended session: run the same list again, from scratch
+  if (event.type === 'RESTART') return createSession(state.tasks)
   if (state.status === 'ended') return state
 
   switch (event.type) {

@@ -40,3 +40,23 @@ body,
 body {
   overscroll-behavior: none;
 }
+
+@theme {
+  --animate-slide-up: slide-up 200ms ease-out;
+
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+    }
+  }
+
+  /* Editors unfold instead of popping in, which felt abrupt */
+  --animate-reveal: reveal 180ms ease-out;
+
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(-0.5rem);
+    }
+  }
+}

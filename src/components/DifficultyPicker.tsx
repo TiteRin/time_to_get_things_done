@@ -9,12 +9,14 @@ const OPTIONS = ORDER.map((value) => ({ value, label: difficultyLabels[value] })
 export function DifficultyPicker({
   value,
   onChange,
+  label = 'Difficulté perçue',
 }: {
   value?: Difficulty
   onChange: (value: Difficulty | undefined) => void
+  label?: string
 }) {
   return (
-    <div role="group" aria-label="Difficulté perçue" className="flex flex-wrap gap-2">
+    <div role="group" aria-label={label} className="flex flex-wrap gap-2">
       {OPTIONS.map(({ value: option, label }) => {
         const selected = option === value
         return (

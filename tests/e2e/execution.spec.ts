@@ -69,15 +69,8 @@ test('runs a session with taps, a swipe and the top menu', async ({ page }) => {
   await page.getByRole('button', { name: 'Afficher le menu' }).click()
   await page.getByRole('button', { name: 'Terminer' }).click()
 
-  await expect(heading(page, 'Session terminée')).toBeVisible()
-  await expect(page.getByRole('list', { name: 'Timeline' }).getByRole('listitem')).toHaveText([
-    '00:00Démarrer · Nettoyer les fontaines',
-    '01:00Pause · Nettoyer les fontaines',
-    '01:30Reprise · Nettoyer les fontaines',
-    '03:30Tâche faite · Nettoyer les fontaines',
-    '03:40Tâche faite · Faire la vaisselle',
-    '03:45Session terminée · Faire les litières',
-  ])
+  await expect(heading(page, 'Bravo !')).toBeVisible()
+  await expect(page.getByText('1 tâche effectuée sur 3, temps passé : 4 minutes')).toBeVisible()
 })
 
 test('ends the session after the last task', async ({ page }) => {
@@ -86,6 +79,7 @@ test('ends the session after the last task', async ({ page }) => {
     await page.getByRole('button', { name: 'Tâche suivante' }).click()
   }
 
-  await expect(heading(page, 'Session terminée')).toBeVisible()
-  await expect(page.getByRole('list', { name: 'Timeline' }).getByRole('listitem')).toHaveCount(3)
+  // Nothing was ever started: the debriefing offers to run the list again
+  await expect(heading(page, 'Aucune tâche effectuée')).toBeVisible()
+  await expect(page.getByText('0 tâche effectuée sur 3, temps passé : 0 minute')).toBeVisible()
 })

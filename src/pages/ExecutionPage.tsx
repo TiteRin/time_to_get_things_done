@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Link, Navigate } from 'react-router'
+import { Link, Navigate, useNavigate } from 'react-router'
+import type { TimelineEntry } from '@/domain/session'
 import type { Task } from '@/domain/task'
 import { ExecutionScreen } from '@/components/ExecutionScreen'
-import { SessionEndScreen } from '@/components/SessionEndScreen'
+import { DebriefingScreen } from '@/components/DebriefingScreen'
 import { useSession } from '@/hooks/useSession'
 import { useTasks } from '@/hooks/useTasks'
 import { loadLastList } from '@/storage/lastList'
@@ -27,25 +28,11 @@ function LastListSession() {
 }
 
 function ExecutionSession({ tasks }: { tasks: Task[] }) {
-  const { state, currentTask, toggle, next, openMenu, closeMenu, finish } = useSession(tasks)
+  const { state, currentTask, toggle, next, openMenu, closeMenu, finish, restart } =
+    useSession(tasks)
 
   if (state.status === 'ended' || !currentTask) {
-    return (
-      <SessionEndScreen
-        tasks={state.tasks}
-        timeline={state.timeline}
-        footer={
-          <div className="flex flex-col gap-2">
-            <Link to="/generation" className="font-medium text-accent-secondary">
-              Nouvelle liste
-            </Link>
-            <Link to="/configuration" className="font-medium text-accent-secondary">
-              Configuration
-            </Link>
-          </div>
-        }
-      />
-    )
+    return <SessionDebriefing tasks={state.tasks} timeline={state.timeline} onRestart={restart} />
   }
 
   return (
@@ -65,6 +52,33 @@ function ExecutionSession({ tasks }: { tasks: Task[] }) {
           Configuration
         </Link>
       }
+    />
+  )
+}
+
+/** Shows the stored version of each task, so edits made from the debriefing show up at once */
+function SessionDebriefing({
+  tasks,
+  timeline,
+  onRestart,
+}: {
+  tasks: Task[]
+  timeline: TimelineEntry[]
+  onRestart: () => void
+}) {
+  const { tasks: stored, updateTask } = useTasks()
+  const navigate = useNavigate()
+
+  if (!stored) return null
+
+  const byId = new Map(stored.map((task) => [task.id, task]))
+  return (
+    <DebriefingScreen
+      tasks={tasks.map((task) => byId.get(task.id) ?? task)}
+      timeline={timeline}
+      onUpdateTask={(task) => void updateTask(task)}
+      onRestart={onRestart}
+      onClose={() => navigate('/generation')}
     />
   )
 }

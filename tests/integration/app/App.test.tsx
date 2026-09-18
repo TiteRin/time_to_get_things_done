@@ -92,14 +92,14 @@ describe('App', () => {
     expect(screen.getByRole('heading', { name: 'Configuration' })).toBeInTheDocument()
   })
 
-  it('navigates from the session end screen back to the generation screen', async () => {
+  it('closes the debriefing back to the generation screen', async () => {
     const user = userEvent.setup()
     renderAt('/generation')
 
     await startSession(user)
     await user.click(await screen.findByRole('button', { name: 'Afficher le menu' }))
     await user.click(screen.getByRole('button', { name: 'Terminer' }))
-    await user.click(screen.getByRole('link', { name: 'Nouvelle liste' }))
+    await user.click(await screen.findByRole('button', { name: 'Fermer' }))
 
     expect(await screen.findByRole('heading', { name: 'Choisir les tâches' })).toBeInTheDocument()
   })

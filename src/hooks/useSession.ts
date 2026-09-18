@@ -10,6 +10,7 @@ export type SessionControls = {
   openMenu: () => void
   closeMenu: () => void
   finish: () => void
+  restart: () => void
 }
 
 const TOGGLE_EVENT = { idle: 'START', running: 'PAUSE', paused: 'RESUME' } as const
@@ -28,5 +29,6 @@ export function useSession(tasks: Task[], now: () => number = Date.now): Session
     openMenu: () => dispatch({ type: 'OPEN_MENU' }),
     closeMenu: () => dispatch({ type: 'CLOSE_MENU' }),
     finish: () => dispatch({ type: 'FINISH', at: now() }),
+    restart: () => dispatch({ type: 'RESTART' }),
   }
 }
