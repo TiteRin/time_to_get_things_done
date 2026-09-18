@@ -1,6 +1,6 @@
 import { Chip } from '@/components/ui/Chip'
 
-const PRESETS =[5, 10, 15, 20, 30, 45, 60]
+const PRESETS = [5, 10, 15, 20, 30, 45, 60]
 
 function formatDuration(minutes: number): string {
   if (minutes < 60) return `${minutes} min`

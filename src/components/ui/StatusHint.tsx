@@ -19,7 +19,10 @@ export function StatusHint({ status }: StatusHintProps) {
   return (
     <p className="pointer-events-none relative flex items-center gap-2 text-muted-foreground">
       {status === 'running' && (
-        <span aria-hidden="true" className="size-2 animate-pulse rounded-full bg-accent-secondary" />
+        <span
+          aria-hidden="true"
+          className="size-2 animate-pulse rounded-full bg-accent-secondary"
+        />
       )}
       {HINT[status]}
     </p>

@@ -38,16 +38,10 @@ export function ChronoSaveScreen({
       <DifficultyPicker value={difficulty} onChange={setDifficulty} />
 
       <div className="flex flex-col gap-3">
-        <Button
-          disabled={totalMinutes === 0}
-          onClick={() => onReplace(totalMinutes, difficulty)}
-        >
+        <Button disabled={totalMinutes === 0} onClick={() => onReplace(totalMinutes, difficulty)}>
           Remplacer par {totalMinutes} min (temps total)
         </Button>
-        <Button
-          disabled={actualMinutes === 0}
-          onClick={() => onReplace(actualMinutes, difficulty)}
-        >
+        <Button disabled={actualMinutes === 0} onClick={() => onReplace(actualMinutes, difficulty)}>
           Remplacer par {actualMinutes} min (temps effectif)
         </Button>
         <Button variant="secondary" onClick={() => onSkip(difficulty)}>
