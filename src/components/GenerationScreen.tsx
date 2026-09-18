@@ -4,6 +4,7 @@ import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-
 import { CSS } from '@dnd-kit/utilities'
 import type { ReactNode } from 'react'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { Button } from '@/components/ui/Button'
 import type { Equipment } from '@/domain/equipment'
 import type { Room } from '@/domain/room'
 import { groupTasksByRoom } from '@/domain/taskGrouping'
@@ -81,31 +82,22 @@ export function GenerationScreen({
         </p>
         <div className="flex gap-4">
           {step === 'select' ? (
-            <button
-              type="button"
+            <Button
+              variant="secondary"
               onClick={onNextStep}
               disabled={count === 0}
-              className="flex-1 rounded-xl border border-border py-3 font-medium text-foreground disabled:opacity-40"
+              className="flex-1"
             >
               Étape suivante
-            </button>
+            </Button>
           ) : (
-            <button
-              type="button"
-              onClick={onPreviousStep}
-              className="flex-1 rounded-xl border border-border py-3 font-medium text-foreground"
-            >
+            <Button variant="secondary" onClick={onPreviousStep} className="flex-1">
               Étape précédente
-            </button>
+            </Button>
           )}
-          <button
-            type="button"
-            onClick={onStart}
-            disabled={count === 0}
-            className="flex-1 rounded-xl bg-accent py-3 font-medium text-accent-foreground disabled:opacity-40"
-          >
+          <Button onClick={onStart} disabled={count === 0} className="flex-1">
             Démarrer
-          </button>
+          </Button>
         </div>
         {footerExtra}
       </footer>
@@ -168,20 +160,16 @@ function SelectionList({
                       {details(task)}
                     </span>
                   </span>
-                  <button
-                    type="button"
+                  <Button
+                    size="sm"
+                    variant={isSelected ? 'primary' : 'secondary'}
                     onClick={() => onToggle(task.id)}
                     aria-pressed={isSelected}
                     aria-describedby={`task-details-${task.id}`}
                     aria-label={`${isSelected ? 'Désélectionner' : 'Sélectionner'} ${task.name}`}
-                    className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
-                      isSelected
-                        ? 'bg-accent text-accent-foreground'
-                        : 'border border-border text-foreground'
-                    }`}
                   >
                     {isSelected ? 'Désélectionner' : 'Sélectionner'}
-                  </button>
+                  </Button>
                 </li>
               )
             })}
@@ -284,14 +272,14 @@ function OrderingItem({
         <span className="block font-medium text-foreground">{task.name}</span>
         <span className="block text-sm text-muted-foreground">{roomName}</span>
       </span>
-      <button
-        type="button"
+      <Button
+        size="sm"
+        variant="secondary"
         onClick={() => onRemove(task.id)}
         aria-label={`Retirer ${task.name}`}
-        className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-foreground"
       >
         Retirer
-      </button>
+      </Button>
     </li>
   )
 }

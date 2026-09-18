@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { Button } from '@/components/ui/Button'
+import { buttonClassName } from '@/components/ui/buttonClassName'
 import { formatChronoTime } from '@/domain/duration'
 import type { SessionStatus } from '@/domain/session'
 import type { Task } from '@/domain/task'
@@ -21,8 +23,7 @@ const STATUS_HINT = {
   paused: 'En pause',
 } as const
 
-const FINISH_CLASS =
-  'rounded-2xl bg-accent py-4 text-lg font-semibold text-accent-foreground pb-[max(1rem,env(safe-area-inset-bottom))]'
+const FINISH_SAFE_AREA = 'pb-[max(1rem,env(safe-area-inset-bottom))]'
 
 /** Unlike the Exécution screen, the chrono is a deliberate, visible timer */
 export function ChronoScreen({
@@ -84,11 +85,14 @@ export function ChronoScreen({
       {/* Reserves the row's space even when hidden, so it doesn't shift the centered
           content above once Terminer appears */}
       {started ? (
-        <button type="button" onClick={onFinish} className={FINISH_CLASS}>
+        <Button size="lg" onClick={onFinish} className={FINISH_SAFE_AREA}>
           Terminer
-        </button>
+        </Button>
       ) : (
-        <div aria-hidden="true" className={`invisible ${FINISH_CLASS}`}>
+        <div
+          aria-hidden="true"
+          className={`invisible ${buttonClassName({ size: 'lg' })} ${FINISH_SAFE_AREA}`}
+        >
           Terminer
         </div>
       )}
@@ -102,20 +106,12 @@ export function ChronoScreen({
         >
           <p className="text-lg font-medium">Abandonner ce chronométrage ?</p>
           <div className="flex w-full flex-col gap-3">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="rounded-2xl border border-border px-6 py-4 text-lg font-semibold text-foreground active:bg-surface"
-            >
+            <Button size="lg" variant="secondary" onClick={onCancel}>
               Abandonner
-            </button>
-            <button
-              type="button"
-              onClick={() => setConfirmingCancel(false)}
-              className="rounded-2xl bg-accent px-6 py-4 text-lg font-semibold text-accent-foreground active:bg-accent/85"
-            >
+            </Button>
+            <Button size="lg" onClick={() => setConfirmingCancel(false)}>
               Continuer
-            </button>
+            </Button>
           </div>
         </div>
       )}

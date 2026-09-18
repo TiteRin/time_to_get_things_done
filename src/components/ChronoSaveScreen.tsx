@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { DifficultyPicker } from '@/components/DifficultyPicker'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { Button } from '@/components/ui/Button'
 import { minutesFromMs } from '@/domain/duration'
 import type { Difficulty, Task } from '@/domain/task'
 
@@ -40,29 +41,21 @@ export function ChronoSaveScreen({
       <DifficultyPicker value={difficulty} onChange={setDifficulty} />
 
       <div className="flex flex-col gap-3">
-        <button
-          type="button"
+        <Button
           disabled={totalMinutes === 0}
           onClick={() => onReplace(totalMinutes, difficulty)}
-          className="rounded-xl bg-accent py-3 font-medium text-accent-foreground disabled:opacity-40"
         >
           Remplacer par {totalMinutes} min (temps total)
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
           disabled={actualMinutes === 0}
           onClick={() => onReplace(actualMinutes, difficulty)}
-          className="rounded-xl bg-accent py-3 font-medium text-accent-foreground disabled:opacity-40"
         >
           Remplacer par {actualMinutes} min (temps effectif)
-        </button>
-        <button
-          type="button"
-          onClick={() => onSkip(difficulty)}
-          className="rounded-xl border border-border py-3 font-medium text-foreground"
-        >
+        </Button>
+        <Button variant="secondary" onClick={() => onSkip(difficulty)}>
           Ne pas remplacer
-        </button>
+        </Button>
       </div>
     </main>
   )

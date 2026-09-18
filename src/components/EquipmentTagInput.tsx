@@ -1,4 +1,5 @@
 import { useId, useState } from 'react'
+import { Button } from '@/components/ui/Button'
 import type { Equipment } from '@/domain/equipment'
 
 export function EquipmentTagInput({
@@ -61,13 +62,7 @@ export function EquipmentTagInput({
           }}
           className="flex-1 rounded-xl border border-border bg-surface px-4 py-3 text-foreground"
         />
-        <button
-          type="button"
-          onClick={submitNewEquipment}
-          className="rounded-xl bg-accent px-4 py-3 font-medium text-accent-foreground"
-        >
-          Ajouter
-        </button>
+        <Button onClick={submitNewEquipment}>Ajouter</Button>
       </div>
     </div>
   )

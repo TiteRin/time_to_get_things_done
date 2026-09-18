@@ -3,6 +3,7 @@ import { DifficultyPicker } from '@/components/DifficultyPicker'
 import { DurationPicker } from '@/components/DurationPicker'
 import { EquipmentTagInput } from '@/components/EquipmentTagInput'
 import { RoomSelect } from '@/components/RoomSelect'
+import { Button } from '@/components/ui/Button'
 import type { Equipment } from '@/domain/equipment'
 import type { Room } from '@/domain/room'
 import type { Difficulty, Task } from '@/domain/task'
@@ -122,12 +123,7 @@ export function TaskForm({
         </p>
       )}
 
-      <button
-        type="submit"
-        className="rounded-xl bg-accent px-4 py-3 font-medium text-accent-foreground"
-      >
-        Enregistrer
-      </button>
+      <Button type="submit">Enregistrer</Button>
     </form>
   )
 }

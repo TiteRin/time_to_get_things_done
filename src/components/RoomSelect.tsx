@@ -1,4 +1,5 @@
 import { useId, useState } from 'react'
+import { Button } from '@/components/ui/Button'
 import type { Room } from '@/domain/room'
 
 export function RoomSelect({
@@ -58,13 +59,7 @@ export function RoomSelect({
             }}
             className="flex-1 rounded-xl border border-border bg-surface px-4 py-3 text-foreground"
           />
-          <button
-            type="button"
-            onClick={submitNewRoom}
-            className="rounded-xl bg-accent px-4 py-3 font-medium text-accent-foreground"
-          >
-            Ajouter
-          </button>
+          <Button onClick={submitNewRoom}>Ajouter</Button>
         </div>
       ) : (
         <button
