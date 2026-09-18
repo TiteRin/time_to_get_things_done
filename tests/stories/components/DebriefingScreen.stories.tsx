@@ -138,7 +138,9 @@ export const Empty: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByText('Aucune tâche démarrée.')).toBeInTheDocument()
-    await expect(canvas.getByRole('heading', { name: 'Aucune tâche effectuée' })).toBeInTheDocument()
+    await expect(
+      canvas.getByRole('heading', { name: 'Aucune tâche effectuée' }),
+    ).toBeInTheDocument()
     await expect(
       canvas.getByText('0 tâche effectuée sur 3, temps passé : 0 minute'),
     ).toBeInTheDocument()
