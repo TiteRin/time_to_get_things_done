@@ -3,8 +3,8 @@ import type { DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { ReactNode } from 'react'
-import { ThemeToggle } from '@/components/ThemeToggle'
 import { Button } from '@/components/ui/Button'
+import { ScreenHeader } from '@/components/ui/ScreenHeader'
 import type { Equipment } from '@/domain/equipment'
 import type { Room } from '@/domain/room'
 import { groupTasksByRoom } from '@/domain/taskGrouping'
@@ -50,12 +50,10 @@ export function GenerationScreen({
   return (
     // The footer supplies the bottom padding so it can stick flush to the viewport
     <main className="flex min-h-dvh flex-col bg-background p-6 pb-0">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-foreground">
-          {step === 'select' ? 'Choisir les tâches' : 'Ordonner les tâches'}
-        </h1>
-        <ThemeToggle />
-      </div>
+      <ScreenHeader
+        title={step === 'select' ? 'Choisir les tâches' : 'Ordonner les tâches'}
+        className="mb-6"
+      />
 
       <div className="flex-1">
         {step === 'select' ? (

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { ScreenHeader } from '@/components/ui/ScreenHeader'
 import type { Room } from '@/domain/room'
 import { groupTasksByRoom } from '@/domain/taskGrouping'
 import type { Task } from '@/domain/task'
@@ -21,10 +21,7 @@ export function TaskPicker({
 
   return (
     <main className="flex min-h-dvh flex-col bg-background p-6 pb-0">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-foreground">Choisir une tâche à chronométrer</h1>
-        <ThemeToggle />
-      </div>
+      <ScreenHeader title="Choisir une tâche à chronométrer" className="mb-6" />
 
       <div className="flex-1">
         <div className="flex flex-col gap-6">

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { DifficultyPicker } from '@/components/DifficultyPicker'
-import { ThemeToggle } from '@/components/ThemeToggle'
 import { Button } from '@/components/ui/Button'
+import { ScreenHeader } from '@/components/ui/ScreenHeader'
 import { minutesFromMs } from '@/domain/duration'
 import type { Difficulty, Task } from '@/domain/task'
 
@@ -27,10 +27,7 @@ export function ChronoSaveScreen({
 
   return (
     <main className="flex min-h-dvh flex-col gap-6 bg-background p-6 text-foreground">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Mettre à jour « {task.name} » ?</h1>
-        <ThemeToggle />
-      </div>
+      <ScreenHeader title={`Mettre à jour « ${task.name} » ?`} />
 
       <p className="text-muted-foreground">
         {task.expectedDuration !== undefined
