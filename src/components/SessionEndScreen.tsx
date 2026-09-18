@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { ScreenHeader } from '@/components/ui/ScreenHeader'
 import { formatElapsedTime } from '@/domain/duration'
 import type { TimelineEntry } from '@/domain/session'
 import type { Task } from '@/domain/task'
@@ -26,10 +26,7 @@ export function SessionEndScreen({
 
   return (
     <main className="min-h-dvh bg-background px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-8 text-foreground">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Session terminée</h1>
-        <ThemeToggle />
-      </div>
+      <ScreenHeader title="Session terminée" size="lg" className="mb-6" />
 
       {timeline.length === 0 ? (
         <p className="text-muted-foreground">Aucune action enregistrée.</p>

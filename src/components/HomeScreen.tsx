@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { Button } from '@/components/ui/Button'
 
 export function HomeScreen({
   onGenerate,
@@ -16,20 +17,12 @@ export function HomeScreen({
       <ThemeToggle className="absolute top-[max(1rem,env(safe-area-inset-top))] right-4" />
       <h1 className="text-2xl font-bold text-foreground">Time To Get Things Done</h1>
       <div className="flex w-full max-w-sm flex-col gap-4">
-        <button
-          type="button"
-          onClick={onGenerate}
-          className="rounded-xl bg-accent py-4 text-lg font-medium text-accent-foreground"
-        >
+        <Button size="lg" onClick={onGenerate}>
           Générer une liste
-        </button>
-        <button
-          type="button"
-          onClick={onChrono}
-          className="rounded-xl border border-border py-4 text-lg font-medium text-foreground"
-        >
+        </Button>
+        <Button size="lg" variant="secondary" onClick={onChrono}>
           Chronométrer une tâche
-        </button>
+        </Button>
       </div>
       {footerExtra}
     </main>

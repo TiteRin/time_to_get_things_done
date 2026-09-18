@@ -1,3 +1,4 @@
+import { Chip } from '@/components/ui/Chip'
 import { difficultyLabels } from '@/domain/task'
 import type { Difficulty } from '@/domain/task'
 
@@ -17,19 +18,13 @@ export function DifficultyPicker({
       {OPTIONS.map(({ value: option, label }) => {
         const selected = option === value
         return (
-          <button
+          <Chip
             key={option}
-            type="button"
-            aria-pressed={selected}
+            selected={selected}
             onClick={() => onChange(selected ? undefined : option)}
-            className={`rounded-full border px-4 py-2 text-sm font-medium ${
-              selected
-                ? 'border-accent bg-accent text-accent-foreground'
-                : 'border-border text-foreground active:bg-surface'
-            }`}
           >
             {label}
-          </button>
+          </Chip>
         )
       })}
     </div>

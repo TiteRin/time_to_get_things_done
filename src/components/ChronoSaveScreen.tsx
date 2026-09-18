@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { DifficultyPicker } from '@/components/DifficultyPicker'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { Button } from '@/components/ui/Button'
+import { ScreenHeader } from '@/components/ui/ScreenHeader'
 import { minutesFromMs } from '@/domain/duration'
 import type { Difficulty, Task } from '@/domain/task'
 
@@ -26,10 +27,7 @@ export function ChronoSaveScreen({
 
   return (
     <main className="flex min-h-dvh flex-col gap-6 bg-background p-6 text-foreground">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Mettre à jour « {task.name} » ?</h1>
-        <ThemeToggle />
-      </div>
+      <ScreenHeader title={`Mettre à jour « ${task.name} » ?`} />
 
       <p className="text-muted-foreground">
         {task.expectedDuration !== undefined
@@ -40,29 +38,15 @@ export function ChronoSaveScreen({
       <DifficultyPicker value={difficulty} onChange={setDifficulty} />
 
       <div className="flex flex-col gap-3">
-        <button
-          type="button"
-          disabled={totalMinutes === 0}
-          onClick={() => onReplace(totalMinutes, difficulty)}
-          className="rounded-xl bg-accent py-3 font-medium text-accent-foreground disabled:opacity-40"
-        >
+        <Button disabled={totalMinutes === 0} onClick={() => onReplace(totalMinutes, difficulty)}>
           Remplacer par {totalMinutes} min (temps total)
-        </button>
-        <button
-          type="button"
-          disabled={actualMinutes === 0}
-          onClick={() => onReplace(actualMinutes, difficulty)}
-          className="rounded-xl bg-accent py-3 font-medium text-accent-foreground disabled:opacity-40"
-        >
+        </Button>
+        <Button disabled={actualMinutes === 0} onClick={() => onReplace(actualMinutes, difficulty)}>
           Remplacer par {actualMinutes} min (temps effectif)
-        </button>
-        <button
-          type="button"
-          onClick={() => onSkip(difficulty)}
-          className="rounded-xl border border-border py-3 font-medium text-foreground"
-        >
+        </Button>
+        <Button variant="secondary" onClick={() => onSkip(difficulty)}>
           Ne pas remplacer
-        </button>
+        </Button>
       </div>
     </main>
   )
