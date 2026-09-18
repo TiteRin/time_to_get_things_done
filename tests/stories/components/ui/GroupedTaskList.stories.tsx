@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Button } from '@/components/ui/Button'
 import { GroupedTaskList } from '@/components/ui/GroupedTaskList'
+import { TaskItem } from '@/components/ui/TaskItem'
 import { sampleTasks } from '@/fixtures/tasks'
 
 const rooms = [
@@ -16,11 +17,7 @@ const meta = {
   args: {
     tasks: sampleTasks,
     rooms,
-    renderRow: (task) => (
-      <button type="button" className="block w-full py-3 text-left font-medium text-foreground">
-        {task.name}
-      </button>
-    ),
+    renderRow: (task) => <TaskItem name={task.name} onClick={() => {}} />,
   },
   argTypes: { renderRow: { control: false } },
   decorators: [
@@ -41,19 +38,16 @@ export const Default: Story = {}
 /** Rows with details and an inline action, as in the Génération selection step. */
 export const WithRowActions: Story = {
   args: {
-    rowClassName: 'flex items-center gap-4 py-3',
     renderRow: (task) => (
-      <>
-        <span className="flex-1">
-          <span className="block font-medium text-foreground">{task.name}</span>
-          <span className="block text-sm text-muted-foreground">
-            Durée : {task.expectedDuration ?? '?'} min
-          </span>
-        </span>
-        <Button size="sm" variant="secondary">
-          Sélectionner
-        </Button>
-      </>
+      <TaskItem
+        name={task.name}
+        details={`Durée : ${task.expectedDuration ?? '?'} min`}
+        trailing={
+          <Button size="sm" variant="secondary">
+            Sélectionner
+          </Button>
+        }
+      />
     ),
   },
 }

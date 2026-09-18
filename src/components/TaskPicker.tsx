@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { GroupedTaskList } from '@/components/ui/GroupedTaskList'
 import { ScreenHeader } from '@/components/ui/ScreenHeader'
+import { TaskItem } from '@/components/ui/TaskItem'
 import type { Room } from '@/domain/room'
 import type { Task } from '@/domain/task'
 
@@ -26,14 +27,11 @@ export function TaskPicker({
           tasks={tasks}
           rooms={rooms}
           renderRow={(task) => (
-            <button
-              type="button"
+            <TaskItem
+              name={task.name}
               onClick={() => onSelect(task.id)}
-              aria-label={`Chronométrer ${task.name}`}
-              className="block w-full py-3 text-left font-medium text-foreground"
-            >
-              {task.name}
-            </button>
+              ariaLabel={`Chronométrer ${task.name}`}
+            />
           )}
         />
       </div>

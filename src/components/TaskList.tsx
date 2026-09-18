@@ -1,4 +1,5 @@
 import { GroupedTaskList } from '@/components/ui/GroupedTaskList'
+import { TaskItem } from '@/components/ui/TaskItem'
 import type { Room } from '@/domain/room'
 import type { Task } from '@/domain/task'
 
@@ -15,15 +16,7 @@ export function TaskList({
     <GroupedTaskList
       tasks={tasks}
       rooms={rooms}
-      renderRow={(task) => (
-        <button
-          type="button"
-          onClick={() => onSelect?.(task)}
-          className="w-full py-3 text-left font-medium text-foreground"
-        >
-          {task.name}
-        </button>
-      )}
+      renderRow={(task) => <TaskItem name={task.name} onClick={() => onSelect?.(task)} />}
     />
   )
 }

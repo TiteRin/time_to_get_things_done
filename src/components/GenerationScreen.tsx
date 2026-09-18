@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 import { Button } from '@/components/ui/Button'
 import { GroupedTaskList } from '@/components/ui/GroupedTaskList'
 import { ScreenHeader } from '@/components/ui/ScreenHeader'
+import { TaskItem } from '@/components/ui/TaskItem'
 import type { Equipment } from '@/domain/equipment'
 import type { Room } from '@/domain/room'
 import { difficultyLabels } from '@/domain/task'
@@ -137,32 +138,29 @@ function SelectionList({
       tasks={tasks}
       rooms={rooms}
       // scroll-mb keeps a focused row visible above the sticky footer
-      rowClassName="flex scroll-mb-40 items-center gap-4 py-3"
+      rowClassName="scroll-mb-40"
       renderRow={(task) => {
         const isSelected = selectedIds.has(task.id)
+        const detailsId = `task-details-${task.id}`
         return (
-          <>
-            <span className="flex-1">
-              <span
-                className={`block font-medium ${isSelected ? 'text-accent-secondary' : 'text-foreground'}`}
+          <TaskItem
+            name={task.name}
+            selected={isSelected}
+            details={details(task)}
+            detailsId={detailsId}
+            trailing={
+              <Button
+                size="sm"
+                variant={isSelected ? 'primary' : 'secondary'}
+                onClick={() => onToggle(task.id)}
+                aria-pressed={isSelected}
+                aria-describedby={detailsId}
+                aria-label={`${isSelected ? 'Désélectionner' : 'Sélectionner'} ${task.name}`}
               >
-                {task.name}
-              </span>
-              <span id={`task-details-${task.id}`} className="block text-sm text-muted-foreground">
-                {details(task)}
-              </span>
-            </span>
-            <Button
-              size="sm"
-              variant={isSelected ? 'primary' : 'secondary'}
-              onClick={() => onToggle(task.id)}
-              aria-pressed={isSelected}
-              aria-describedby={`task-details-${task.id}`}
-              aria-label={`${isSelected ? 'Désélectionner' : 'Sélectionner'} ${task.name}`}
-            >
-              {isSelected ? 'Désélectionner' : 'Sélectionner'}
-            </Button>
-          </>
+                {isSelected ? 'Désélectionner' : 'Sélectionner'}
+              </Button>
+            }
+          />
         )
       }}
     />
@@ -241,34 +239,38 @@ function OrderingItem({
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className="flex items-center gap-4 bg-background py-3"
+      className="bg-background"
     >
-      <button
-        type="button"
-        {...attributes}
-        {...listeners}
-        aria-label={`Déplacer ${task.name}`}
-        onKeyDown={(event) => {
-          if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
-          event.preventDefault()
-          onReorder(index, event.key === 'ArrowDown' ? index + 1 : index - 1)
-        }}
-        className="cursor-grab touch-none px-1 text-lg text-muted-foreground"
-      >
-        ⠿
-      </button>
-      <span className="flex-1">
-        <span className="block font-medium text-foreground">{task.name}</span>
-        <span className="block text-sm text-muted-foreground">{roomName}</span>
-      </span>
-      <Button
-        size="sm"
-        variant="secondary"
-        onClick={() => onRemove(task.id)}
-        aria-label={`Retirer ${task.name}`}
-      >
-        Retirer
-      </Button>
+      <TaskItem
+        name={task.name}
+        details={roomName}
+        leading={
+          <button
+            type="button"
+            {...attributes}
+            {...listeners}
+            aria-label={`Déplacer ${task.name}`}
+            onKeyDown={(event) => {
+              if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
+              event.preventDefault()
+              onReorder(index, event.key === 'ArrowDown' ? index + 1 : index - 1)
+            }}
+            className="cursor-grab touch-none px-1 text-lg text-muted-foreground"
+          >
+            ⠿
+          </button>
+        }
+        trailing={
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => onRemove(task.id)}
+            aria-label={`Retirer ${task.name}`}
+          >
+            Retirer
+          </Button>
+        }
+      />
     </li>
   )
 }
