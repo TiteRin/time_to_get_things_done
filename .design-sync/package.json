@@ -1,0 +1,5 @@
+{
+  "name": "ttgtd-ui",
+  "version": "0.0.0",
+  "types": ".types/.design-sync/entry.d.ts"
+}
